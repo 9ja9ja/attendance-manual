@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근태 기록 조회 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2129;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--blue:#58a6ff;--green:#3fb950;--orange:#d29922;--red:#f85149;--purple:#bc8cff;--teal:#39d9c1;--pink:#f778ba;--coral:#ea8a5e;--cyan:#56d4dd}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+    .standalone-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    .standalone-nav .back-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;cursor:pointer;transition:all .15s;font-family:inherit}
+    .standalone-nav .back-btn:hover{background:rgba(88,166,255,.15)}
+    .standalone-nav .page-title{font-size:.85rem;font-weight:600;color:var(--text2)}
+    .standalone-nav .page-badge{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(63,185,80,.12);color:var(--green)}
+    @media all{body.in-iframe .standalone-nav{display:none}}
+    .mfg-content{max-width:960px;margin:0 auto;padding:2.5rem 2rem 4rem}
+    .mfg-content h1{font-size:1.8rem;font-weight:700;margin-bottom:.5rem}
+    .mfg-content .subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+    .mfg-content h2{font-size:1.4rem;font-weight:700;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .mfg-content h3{font-size:1.15rem;font-weight:600;margin:1.5rem 0 .75rem}
+    .mfg-content p{margin-bottom:.75rem;color:var(--text);font-size:.92rem;line-height:1.7}
+    .mfg-content ul{margin:.5rem 0 1rem;padding-left:1.25rem;color:var(--text)}
+    .mfg-content li{font-size:.92rem;line-height:1.7;margin-bottom:.4rem}
+    .section-divider{border:none;height:2px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:3rem 0}
+    .toc{margin:1.5rem 0 2.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+    .toc-title{font-size:.85rem;font-weight:700;color:var(--text2);margin-bottom:.75rem}
+    .toc a{color:var(--blue);text-decoration:none;font-size:.88rem;display:block;padding:3px 0}
+    .toc a:hover{text-decoration:underline}
+    .fab-toc{position:fixed;bottom:2rem;right:2rem;z-index:999;width:48px;height:48px;border-radius:50%;background:var(--blue);border:2px solid rgba(88,166,255,.4);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+    .fab-toc:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(88,166,255,.4)}
+    .fab-toc.active{background:var(--bg3);border-color:var(--border)}
+    .float-toc{position:fixed;bottom:5.5rem;right:2rem;z-index:998;width:340px;max-height:70vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
+    .float-toc.show{display:block;animation:tocSlideIn .2s ease}
+    @keyframes tocSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .float-toc .toc-title{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:.6rem}
+    .float-toc a{color:var(--blue);text-decoration:none;font-size:.82rem;display:block;padding:4px 0}
+    .float-toc a:hover{text-decoration:underline;color:#fff}
+    body.in-iframe .fab-toc{bottom:1.5rem;right:1.5rem}
+    body.in-iframe .float-toc{bottom:4.5rem;right:1.5rem}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+    .tag{padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);color:var(--blue)}
+    .nav-links{display:flex;gap:8px;flex-wrap:wrap;margin:1.5rem 0}
+    .nav-links a{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;transition:all .15s}
+    .nav-links a:hover{background:rgba(88,166,255,.15)}
+    .note-box{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--orange);margin:.75rem 0;line-height:1.7}
+    .important-box{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--red);margin:.75rem 0;line-height:1.7}
+    .key-box{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--green);margin:.75rem 0;line-height:1.7}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+    .trigger-box{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:1rem 1.25rem}
+    .trigger-box h3{font-size:1rem;font-weight:600;margin:0 0 .5rem;color:var(--text)}
+    .trigger-box p{font-size:.85rem;color:var(--text2);margin:0;line-height:1.7}
+    .trigger-box.t-green{border-left-color:var(--green)}.trigger-box.t-orange{border-left-color:var(--orange)}.trigger-box.t-purple{border-left-color:var(--purple)}.trigger-box.t-teal{border-left-color:var(--teal)}.trigger-box.t-red{border-left-color:var(--red)}.trigger-box.t-pink{border-left-color:var(--pink)}.trigger-box.t-coral{border-left-color:var(--coral)}.trigger-box.t-cyan{border-left-color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+    th{text-align:left;font-weight:600;font-size:.78rem;color:var(--text3);padding:8px 10px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    td{padding:10px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--text);line-height:1.7}
+    td strong{white-space:nowrap}
+    .field-spec td:first-child{white-space:nowrap;font-weight:600;color:var(--blue);width:180px}
+    .field-spec td:nth-child(2){color:var(--text2);font-size:.82rem}
+    @media(max-width:768px){.mfg-content{padding:1.5rem 1rem 3rem}.mfg-content h1{font-size:1.4rem}.grid-2,.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">← 인덱스</a>
+    <span class="page-title">근태 기록 조회</span>
+    <span class="page-badge">직원 화면</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>근태 기록 조회</h1>
+    <p class="subtitle">직원이 자신의 출퇴근 시간, 근태 신청 내역, 휴가 신청 내역, 근무 시간을 조회하는 화면들입니다. 4개 조회 화면(출퇴근 시간 조회, 근태 신청 조회, 휴가 신청 조회, 근무 시간 조회)을 하나의 매뉴얼로 정리합니다.</p>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">화면 개요</a>
+      <a href="#commute">출퇴근 시간 조회</a>
+      <a href="#attendance-request">근태 신청 조회</a>
+      <a href="#leave-request">휴가 신청 조회</a>
+      <a href="#work-hours">근무 시간 조회</a>
+      <a href="#related">연결 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="overview">화면 개요</h2>
+    <p>근태 기록 조회는 직원이 자신의 근태 이력을 확인하기 위한 4개 조회 화면으로 구성됩니다. 각 화면은 독립적으로 접근할 수 있으며, 조회 목적에 따라 구분되어 있습니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>출퇴근 시간 조회</h3>
+        <p>일자별 출퇴근 시간, 근무시간, 근태상태 확인</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>근태 신청 조회</h3>
+        <p>외근/출장/연장근무 등 근태 신청 내역 확인</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>휴가 신청 조회</h3>
+        <p>연차/경조/출산육아 등 휴가 신청 내역 확인</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>근무 시간 조회</h3>
+        <p>정상/연장/야간/휴일 근무시간 상세 확인</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="commute">출퇴근 시간 조회</h2>
+    <p>직원의 일자별 출퇴근 기록과 근태 상태를 조회하는 화면입니다.</p>
+
+    <h3>기간 선택</h3>
+    <ul>
+      <li><strong>주간</strong>: 선택한 주의 월~일 출퇴근 기록을 조회합니다.</li>
+      <li><strong>월간</strong>: 선택한 월의 전체 출퇴근 기록을 조회합니다.</li>
+    </ul>
+
+    <h3>조회 항목</h3>
+    <table>
+      <thead>
+        <tr><th>항목</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>일자</strong></td><td>근무일 날짜</td></tr>
+        <tr><td><strong>출근시간</strong></td><td>출근 기록 시간</td></tr>
+        <tr><td><strong>퇴근시간</strong></td><td>퇴근 기록 시간</td></tr>
+        <tr><td><strong>근무시간</strong></td><td>출근~퇴근 사이의 실근무시간 (휴게시간 제외)</td></tr>
+        <tr><td><strong>휴게시간</strong></td><td>근로제에서 지정된 휴게시간</td></tr>
+        <tr><td><strong>근태상태</strong></td><td>정상출근/지각/조퇴/결근/미출근/미퇴근 등</td></tr>
+      </tbody>
+    </table>
+
+    <h3>출퇴근 수정 요청</h3>
+    <p>출퇴근 기록이 누락되거나 오류가 있는 경우, 직원이 수정 요청을 할 수 있습니다.</p>
+    <ul>
+      <li>수정 사유를 입력하여 요청합니다.</li>
+      <li>관리자 승인 후 출퇴근 기록이 수정됩니다.</li>
+    </ul>
+    <div class="important-box">출퇴근 수정 요청은 관리자 승인이 필수입니다. 직원이 직접 출퇴근 기록을 수정할 수 없습니다.</div>
+
+    <h3>근태 이상 건 확인</h3>
+    <p>다음과 같은 근태 이상 건이 리스트에 표시됩니다.</p>
+    <div class="grid-3" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="trigger-box t-red"><h3>미출근</h3><p>출근 기록 없음</p></div>
+      <div class="trigger-box t-coral"><h3>미퇴근</h3><p>퇴근 기록 없음</p></div>
+      <div class="trigger-box t-orange"><h3>지각</h3><p>소정 출근시간 초과</p></div>
+      <div class="trigger-box t-pink"><h3>조퇴</h3><p>소정 퇴근시간 미달</p></div>
+      <div class="trigger-box"><h3>결근</h3><p>근무일 무단 부재</p></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="attendance-request">근태 신청 조회</h2>
+    <p>직원이 신청한 근태(외근, 출장, 연장근무, 야간근무, 휴일근무, 간주근무) 내역을 조회하는 화면입니다.</p>
+
+    <h3>기간 선택</h3>
+    <p>조회할 기간의 시작일과 종료일을 선택하여 해당 범위 내의 근태 신청 내역을 조회합니다.</p>
+
+    <h3>신청 유형별 필터</h3>
+    <ul>
+      <li>전체 / 외근 / 출장 / 연장근무 / 야간근무 / 휴일근무 / 간주근무</li>
+      <li>유형을 선택하면 해당 유형의 신청 건만 필터링되어 표시됩니다.</li>
+    </ul>
+
+    <h3>조회 리스트</h3>
+    <table>
+      <thead>
+        <tr><th>항목</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>근태유형</strong></td><td>외근/출장/연장근무/야간근무/휴일근무/간주근무</td></tr>
+        <tr><td><strong>구분</strong></td><td>유형 내 세부 구분 (예: 국내출장/해외출장)</td></tr>
+        <tr><td><strong>신청일</strong></td><td>근태를 신청한 날짜</td></tr>
+        <tr><td><strong>시작일~종료일</strong></td><td>근태 적용 기간</td></tr>
+        <tr><td><strong>시간</strong></td><td>근태 적용 시간 (시작시간~종료시간)</td></tr>
+        <tr><td><strong>상태</strong></td><td>진행중/승인/반려/취소</td></tr>
+        <tr><td><strong>결재문서번호</strong></td><td>전자결재 연동 시 결재 문서 번호 (클릭 시 결재 문서로 이동)</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">전자결재 연동이 설정된 경우, 결재 진행 상태(진행중/승인/반려)가 함께 표시됩니다. 결재문서번호를 클릭하면 해당 결재 문서로 이동할 수 있습니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="leave-request">휴가 신청 조회</h2>
+    <p>직원이 신청한 휴가 내역을 귀속년도 기준으로 조회하는 화면입니다.</p>
+
+    <h3>귀속년도 기준 조회</h3>
+    <p>귀속년도(YYYY)를 선택하여 해당 년도에 귀속되는 휴가 신청 내역을 조회합니다.</p>
+
+    <h3>휴가유형별 필터</h3>
+    <ul>
+      <li>전체 / 연차 / 경조 / 출산육아 / 기타</li>
+      <li>유형을 선택하면 해당 유형의 휴가 신청 건만 필터링되어 표시됩니다.</li>
+    </ul>
+
+    <h3>조회 리스트</h3>
+    <table>
+      <thead>
+        <tr><th>항목</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>휴가유형</strong></td><td>연차/경조/출산육아/기타</td></tr>
+        <tr><td><strong>휴가명</strong></td><td>세부 휴가 명칭 (예: 결혼휴가, 배우자출산휴가)</td></tr>
+        <tr><td><strong>신청일</strong></td><td>휴가를 신청한 날짜</td></tr>
+        <tr><td><strong>사용기간</strong></td><td>휴가 시작일~종료일</td></tr>
+        <tr><td><strong>사용일수</strong></td><td>사용한 휴가 일수 (0.5일 단위 가능)</td></tr>
+        <tr><td><strong>결재상태</strong></td><td>진행중/승인/반려/취소</td></tr>
+      </tbody>
+    </table>
+
+    <h3>잔여 연차 현황</h3>
+    <p>화면 상단 또는 하단에 해당 귀속년도의 연차 현황이 요약 표시됩니다.</p>
+    <div class="grid-3">
+      <div class="trigger-box t-green">
+        <h3>총 부여 연차</h3>
+        <p>기본연차 + 추가부여 연차</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>사용 연차</h3>
+        <p>승인 완료된 사용 일수</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>잔여 연차</h3>
+        <p>총 부여 - 사용 = 잔여</p>
+      </div>
+    </div>
+    <div class="key-box">마이너스 연차가 허용된 경우, 잔여 연차가 음수(-)로 표시될 수 있습니다. 허용 한도는 관리자가 연차 정책에서 설정합니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="work-hours">근무 시간 조회</h2>
+    <p>직원의 근무 시간을 유형별로 상세하게 조회하는 화면입니다.</p>
+
+    <h3>기간 선택</h3>
+    <ul>
+      <li><strong>주간</strong>: 선택한 주의 일별 근무시간을 조회합니다.</li>
+      <li><strong>월간</strong>: 선택한 월의 일별 근무시간을 조회합니다.</li>
+    </ul>
+
+    <h3>일별 상세</h3>
+    <table>
+      <thead>
+        <tr><th>항목</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>정상근무시간</strong></td><td>소정근로시간 내 실제 근무한 시간</td></tr>
+        <tr><td><strong>연장근무시간</strong></td><td>소정근로시간 초과 근무 시간</td></tr>
+        <tr><td><strong>야간근무시간</strong></td><td>22:00~06:00 사이 근무 시간</td></tr>
+        <tr><td><strong>휴일근무시간</strong></td><td>휴일에 근무한 시간</td></tr>
+        <tr><td><strong>총근무시간</strong></td><td>정상 + 연장 + 야간 + 휴일 합산</td></tr>
+      </tbody>
+    </table>
+
+    <h3>합계 행</h3>
+    <p>조회 기간 내 각 근무 유형별 합계가 하단에 표시됩니다. 주간 조회 시 주간 합계, 월간 조회 시 월간 합계가 집계됩니다.</p>
+
+    <h3>소정근로시간 대비 실근무시간 비교</h3>
+    <p>배포받은 근로제의 소정근로시간과 실제 근무시간을 비교하여 표시합니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-teal">
+        <h3>소정근로시간</h3>
+        <p>근로제에서 정한 기간 내 총 소정근로시간</p>
+      </div>
+      <div class="trigger-box t-coral">
+        <h3>실근무시간</h3>
+        <p>실제 출퇴근 기록 기반의 총 근무시간</p>
+      </div>
+    </div>
+    <div class="note-box">소정근로시간 대비 실근무시간이 초과하면 연장근무로 분류됩니다. 선택근로제 등 유연근무제 적용 시에는 정산 기간 기준으로 비교됩니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="related">연결 문서</h2>
+    <div class="nav-links">
+      <a href="나의근태현황.html" target="_top">나의근태현황 →</a>
+      <a href="근태스케줄.html" target="_top">근태스케줄 →</a>
+      <a href="근태요청관리.html" target="_top">근태요청관리 →</a>
+    </div>
+  </div>
+
+  <button class="fab-toc" id="fabToc" title="목차 열기">☰</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">화면 개요</a>
+    <a href="#commute">출퇴근 시간 조회</a>
+    <a href="#attendance-request">근태 신청 조회</a>
+    <a href="#leave-request">휴가 신청 조회</a>
+    <a href="#work-hours">근무 시간 조회</a>
+    <a href="#related">연결 문서</a>
+  </div>
+
+  <script>
+    if(window.self!==window.top)document.body.classList.add('in-iframe');
+    const fab=document.getElementById('fabToc'),ftoc=document.getElementById('floatToc');
+    fab.addEventListener('click',()=>{const o=ftoc.classList.toggle('show');fab.classList.toggle('active',o)});
+    document.addEventListener('click',e=>{if(!fab.contains(e.target)&&!ftoc.contains(e.target)){ftoc.classList.remove('show');fab.classList.remove('active')}});
+  </script>
+</body>
+</html>

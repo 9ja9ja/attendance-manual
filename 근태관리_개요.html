@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근태관리 개요 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --blue: #58a6ff;
+      --blue-bg: #0d1f3c;
+      --green: #3fb950;
+      --green-bg: #0d2818;
+      --orange: #d29922;
+      --orange-bg: #2a1e00;
+      --red: #f85149;
+      --red-bg: #3b1116;
+      --purple: #bc8cff;
+      --purple-bg: #1e0e3e;
+      --teal: #39d9c1;
+      --teal-bg: #0a2e2a;
+      --pink: #f778ba;
+      --pink-bg: #3a1228;
+      --coral: #ea8a5e;
+      --coral-bg: #2c1a0e;
+      --cyan: #56d4dd;
+      --cyan-bg: #0a2a2e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Standalone navigation bar - hidden inside iframe */
+    .standalone-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .standalone-nav .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .standalone-nav .back-btn:hover { background: rgba(88,166,255,0.15); }
+    .standalone-nav .page-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .standalone-nav .page-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(63,185,80,0.12);
+      color: var(--green);
+    }
+    @media all { body.in-iframe .standalone-nav { display: none; } }
+
+    .mfg-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+    .mfg-content h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .mfg-content .subtitle {
+      color: var(--text2);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .mfg-content h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .mfg-content h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+    }
+    .mfg-content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--text2);
+    }
+    .mfg-content p {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+    .mfg-content ul {
+      margin: 0.5rem 0 1rem;
+      padding-left: 1.25rem;
+      color: var(--text);
+    }
+    .mfg-content li {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 0.4rem;
+    }
+    .section-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 3rem 0;
+    }
+
+    /* TOC */
+    .toc {
+      margin: 1.5rem 0 2.5rem;
+      padding: 1.25rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .toc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 0.75rem;
+    }
+    .toc a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.88rem;
+      display: block;
+      padding: 3px 0;
+    }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Floating TOC */
+    .fab-toc {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--blue); border: 2px solid rgba(88,166,255,0.4);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab-toc:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background: var(--bg3); border-color: var(--border); }
+    .float-toc {
+      position: fixed; bottom: 5.5rem; right: 2rem; z-index: 998;
+      width: 340px; max-height: 70vh; overflow-y: auto;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .float-toc.show { display: block; animation: tocSlideIn 0.2s ease; }
+    @keyframes tocSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .float-toc .toc-title { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 0.6rem; }
+    .float-toc a { color: var(--blue); text-decoration: none; font-size: 0.82rem; display: block; padding: 4px 0; }
+    .float-toc a:hover { text-decoration: underline; color: #fff; }
+    body.in-iframe .fab-toc { bottom: 1.5rem; right: 1.5rem; }
+    body.in-iframe .float-toc { bottom: 4.5rem; right: 1.5rem; }
+
+    /* Tag row */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+    .tag {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      color: var(--blue);
+    }
+
+    /* Nav links */
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.5rem 0; }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: rgba(88,166,255,0.15); }
+
+    /* Boxes */
+    .note-box {
+      background: rgba(210,153,34,0.08);
+      border: 1px solid rgba(210,153,34,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--orange);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .important-box {
+      background: rgba(248,81,73,0.08);
+      border: 1px solid rgba(248,81,73,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--red);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .key-box {
+      background: rgba(63,185,80,0.08);
+      border: 1px solid rgba(63,185,80,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--green);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .diff-box {
+      background: rgba(188,140,255,0.08);
+      border: 1px solid rgba(188,140,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--purple);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .formula-box {
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--blue);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+
+    /* Grid & Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1rem 0; }
+    .trigger-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .trigger-box h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .trigger-box p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.7;
+    }
+    .trigger-box.t-green { border-left-color: var(--green); }
+    .trigger-box.t-orange { border-left-color: var(--orange); }
+    .trigger-box.t-purple { border-left-color: var(--purple); }
+    .trigger-box.t-teal { border-left-color: var(--teal); }
+    .trigger-box.t-red { border-left-color: var(--red); }
+    .trigger-box.t-pink { border-left-color: var(--pink); }
+    .trigger-box.t-coral { border-left-color: var(--coral); }
+    .trigger-box.t-cyan { border-left-color: var(--cyan); }
+
+    /* Flow steps */
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flow-step strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+    .flow-step p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text3);
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+      .mfg-content { padding: 1.5rem 1rem 3rem; }
+      .mfg-content h1 { font-size: 1.4rem; }
+      .grid-2, .grid-3, .grid-4, .flow-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">← 인덱스</a>
+    <span class="page-title">근태관리 개요</span>
+    <span class="page-badge">Overview</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>근태관리 서비스는 기준 설정, 요청 확정, 월 마감이 연결된 구조입니다</h1>
+    <p class="subtitle">이 서비스는 단순히 출퇴근 시간을 모아 보여주는 시스템이 아니라, 근로제와 근무패턴으로 예상 출퇴근 프레임을 만들고, 실제 출퇴근 기록과 승인 완료 데이터를 결합해 인정근로시간을 산출한 뒤 월 근태 마감으로 확정하는 운영 체계입니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">근로제/정책 설정</span>
+      <span class="tag">근태 원천 수집</span>
+      <span class="tag">요청·승인·확정</span>
+      <span class="tag">유형 마스터</span>
+      <span class="tag">집계마감 기준데이터</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">업무 개요</a>
+      <a href="#flow">전체 처리 흐름</a>
+      <a href="#perspectives">이 서비스에서 특히 중요한 관점</a>
+      <a href="#reading-order">매뉴얼 읽는 순서</a>
+      <a href="#related">함께 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="overview">업무 개요</h2>
+    <p>근태관리 전체는 네 개의 층으로 이해하는 것이 가장 자연스럽습니다. 먼저 회사 차원의 근무 기준을 정의하고, 다음으로 직원의 실제 출퇴근과 요청 데이터를 수집하며, 그 후 관리자가 승인과 보정을 통해 확정하고, 마지막으로 휴가·출장 유형 같은 마스터가 계산 파라미터로 개입하는 구조입니다.</p>
+
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>1. 근로제/정책 설정</h3>
+        <p>근로제 유형, 소정근로시간, 근무요일, 근무패턴, 선택근무제 정산 방식을 정의합니다. 이 영역은 모든 판정의 출발점입니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>2. 근태 원천 수집</h3>
+        <p>실제 출퇴근, 휴게, 이상 상태, 요청 신청, 근무지, 인정 방식 같은 데이터를 일 단위로 수집합니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>3. 요청/승인/확정</h3>
+        <p>근로제 변경, 출근·퇴근 수정, 근태 수정 요청을 관리자가 승인 또는 반려하며 사후 확정을 수행합니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>4. 유형 마스터 관리</h3>
+        <p>휴가 유형과 출장 유형은 차감 방식과 인정 방식에 직접 개입합니다. 특히 출장유형 설정은 간주근무 기준을 정하는 역할을 합니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="flow">전체 처리 흐름</h2>
+
+    <div class="flow-row">
+      <div class="flow-step">
+        <strong>기준 캘린더 확정</strong>
+        <p>전사 휴일, 사업장 규칙, 개인별 근로제를 먼저 고정합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>근무패턴과 예상 시간 생성</strong>
+        <p>근로제와 근무패턴으로 예상 출퇴근 프레임을 만듭니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>실적과 요청 수집</strong>
+        <p>출퇴근, 휴게, 휴가, 출장, 연장, 수정 요청을 모읍니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>일별 판정과 분류</strong>
+        <p>정상 출퇴근, 연장 인정, 근태 이상, 휴일 근무로 분류합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>월 근태 마감</strong>
+        <p>집계, 보정, 검토 후 급여 반영용 확정 결과로 마감합니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="perspectives">이 서비스에서 특히 중요한 관점</h2>
+
+    <div class="grid-2">
+      <div class="trigger-box t-red">
+        <h3>타각만으로 확정하지 않는다</h3>
+        <p>출퇴근 시각은 기본 실적이지만, 출장, 휴가, 선택근무, 승인된 연장근무 같은 예외는 기안과 유형 설정까지 함께 봐야 최종 판정이 가능합니다.</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>직원 화면은 결과 소비 화면이다</h3>
+        <p>나의 근태 화면은 단순 타임카드가 아니라, 근로제 정보, 신청 현황, 이상 건수, 휴가 현황, 일자별 계산 결과가 모두 보이는 대시보드입니다.</p>
+      </div>
+      <div class="trigger-box t-coral">
+        <h3>근무패턴은 별도 단계다</h3>
+        <p>근무패턴과 예상 출퇴근 시간 수립은 명시적인 중간 단계입니다. 따라서 근태 계산에서는 예상 프레임과 실제 실적을 분리해 저장하는 편이 자연스럽습니다.</p>
+      </div>
+      <div class="trigger-box t-pink">
+        <h3>월마감은 합산이 아니라 확정이다</h3>
+        <p>월 근태 마감은 하루하루 만들어진 분류 데이터를 단순 합산하는 것이 아니라, 미승인·누락·이상 데이터를 해소하고 급여 반영용 확정 결과로 마감하는 단계입니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="reading-order">매뉴얼 읽는 순서</h2>
+    <ul>
+      <li><strong>근무지 관리</strong>와 <strong>근무지 설정 로직</strong>에서 출퇴근 인정 장소와 인정 방식이 어떻게 정해지는지 함께 확인합니다.</li>
+      <li>먼저 <strong>근로제 관리</strong>에서 근태 계산의 기준이 무엇인지 이해합니다.</li>
+      <li>그 다음 <strong>인정근로시간·월마감</strong>에서 실제 계산 흐름을 확인합니다.</li>
+      <li>이후 <strong>근태 요청 관리</strong>와 <strong>직원 근태</strong>에서 운영 프로세스와 사용자 경험을 연결합니다.</li>
+      <li>마지막으로 <strong>휴가 관리</strong>, <strong>출장·외근 유형 관리</strong>를 보면 유형 기준정보가 왜 근태 계산에 중요한지 이해할 수 있습니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="related">함께 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="근무지관리.html" target="_top">근무지 관리 →</a>
+      <a href="근무지설정.html" target="_top">근무지 설정 로직 →</a>
+      <a href="근로제관리.html" target="_top">근로제 관리 →</a>
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간·월마감 →</a>
+      <a href="근태요청관리.html" target="_top">근태 요청 관리 →</a>
+    </div>
+  </div>
+
+  <!-- Floating TOC -->
+  <button class="fab-toc" id="fabToc" title="목차 열기">☰</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">업무 개요</a>
+    <a href="#flow">전체 처리 흐름</a>
+    <a href="#perspectives">중요한 관점</a>
+    <a href="#reading-order">매뉴얼 읽는 순서</a>
+    <a href="#related">함께 보면 좋은 문서</a>
+  </div>
+
+  <script>
+    // iframe detection
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+
+    // Floating TOC toggle
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

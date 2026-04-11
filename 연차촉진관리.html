@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연차촉진 관리 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2129;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--blue:#58a6ff;--green:#3fb950;--orange:#d29922;--red:#f85149;--purple:#bc8cff;--teal:#39d9c1;--pink:#f778ba;--coral:#ea8a5e;--cyan:#56d4dd}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+    .standalone-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    .standalone-nav .back-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;cursor:pointer;transition:all .15s;font-family:inherit}
+    .standalone-nav .back-btn:hover{background:rgba(88,166,255,.15)}
+    .standalone-nav .page-title{font-size:.85rem;font-weight:600;color:var(--text2)}
+    .standalone-nav .page-badge{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(63,185,80,.12);color:var(--green)}
+    @media all{body.in-iframe .standalone-nav{display:none}}
+    .mfg-content{max-width:960px;margin:0 auto;padding:2.5rem 2rem 4rem}
+    .mfg-content h1{font-size:1.8rem;font-weight:700;margin-bottom:.5rem}
+    .mfg-content .subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+    .mfg-content h2{font-size:1.4rem;font-weight:700;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .mfg-content h3{font-size:1.15rem;font-weight:600;margin:1.5rem 0 .75rem}
+    .mfg-content p{margin-bottom:.75rem;color:var(--text);font-size:.92rem;line-height:1.7}
+    .mfg-content ul{margin:.5rem 0 1rem;padding-left:1.25rem;color:var(--text)}
+    .mfg-content li{font-size:.92rem;line-height:1.7;margin-bottom:.4rem}
+    .section-divider{border:none;height:2px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:3rem 0}
+    .toc{margin:1.5rem 0 2.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+    .toc-title{font-size:.85rem;font-weight:700;color:var(--text2);margin-bottom:.75rem}
+    .toc a{color:var(--blue);text-decoration:none;font-size:.88rem;display:block;padding:3px 0}
+    .toc a:hover{text-decoration:underline}
+    .fab-toc{position:fixed;bottom:2rem;right:2rem;z-index:999;width:48px;height:48px;border-radius:50%;background:var(--blue);border:2px solid rgba(88,166,255,.4);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+    .fab-toc:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(88,166,255,.4)}
+    .fab-toc.active{background:var(--bg3);border-color:var(--border)}
+    .float-toc{position:fixed;bottom:5.5rem;right:2rem;z-index:998;width:340px;max-height:70vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
+    .float-toc.show{display:block;animation:tocSlideIn .2s ease}
+    @keyframes tocSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .float-toc .toc-title{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:.6rem}
+    .float-toc a{color:var(--blue);text-decoration:none;font-size:.82rem;display:block;padding:4px 0}
+    .float-toc a:hover{text-decoration:underline;color:#fff}
+    body.in-iframe .fab-toc{bottom:1.5rem;right:1.5rem}
+    body.in-iframe .float-toc{bottom:4.5rem;right:1.5rem}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+    .tag{padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);color:var(--blue)}
+    .nav-links{display:flex;gap:8px;flex-wrap:wrap;margin:1.5rem 0}
+    .nav-links a{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;transition:all .15s}
+    .nav-links a:hover{background:rgba(88,166,255,.15)}
+    .note-box{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--orange);margin:.75rem 0;line-height:1.7}
+    .important-box{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--red);margin:.75rem 0;line-height:1.7}
+    .key-box{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--green);margin:.75rem 0;line-height:1.7}
+    .alert-box{background:rgba(188,140,255,.08);border:1px solid rgba(188,140,255,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--purple);margin:.75rem 0;line-height:1.7}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+    .trigger-box{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:1rem 1.25rem}
+    .trigger-box h3{font-size:1rem;font-weight:600;margin:0 0 .5rem;color:var(--text)}
+    .trigger-box p{font-size:.85rem;color:var(--text2);margin:0;line-height:1.7}
+    .trigger-box.t-green{border-left-color:var(--green)}.trigger-box.t-orange{border-left-color:var(--orange)}.trigger-box.t-purple{border-left-color:var(--purple)}.trigger-box.t-teal{border-left-color:var(--teal)}.trigger-box.t-red{border-left-color:var(--red)}.trigger-box.t-pink{border-left-color:var(--pink)}.trigger-box.t-coral{border-left-color:var(--coral)}.trigger-box.t-cyan{border-left-color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+    th{text-align:left;font-weight:600;font-size:.78rem;color:var(--text3);padding:8px 10px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    td{padding:10px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--text);line-height:1.7}
+    td strong{white-space:nowrap}
+    .field-spec td:first-child{white-space:nowrap;font-weight:600;color:var(--blue);width:180px}
+    .field-spec td:nth-child(2){color:var(--text2);font-size:.82rem}
+    @media(max-width:768px){.mfg-content{padding:1.5rem 1rem 3rem}.mfg-content h1{font-size:1.4rem}.grid-2,.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">&larr; 인덱스</a>
+    <span class="page-title">연차촉진 관리</span>
+    <span class="page-badge">Operation</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>연차촉진 관리</h1>
+    <p class="subtitle">근로기준법 제61조에 따른 연차유급휴가 사용촉진 절차를 관리하는 화면입니다. 1차 촉진(사용 권고)과 2차 촉진(사용시기 지정)을 직원에게 통보하고, 회신 상태를 추적합니다. 촉진 절차를 완료하면 미사용 연차에 대한 사용자의 보상 의무가 면제됩니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">경로: 근태관리 &gt; 연차 &gt; 연차촉진 관리</span>
+      <span class="tag">권한: 관리자</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">화면 개요</a>
+      <a href="#search">검색 영역</a>
+      <a href="#scope">촉진 대상 휴가 범위</a>
+      <a href="#tabs">1년 이상 / 1년 미만 탭</a>
+      <a href="#notify">통보 버튼</a>
+      <a href="#template">촉진 메일 발송 템플릿</a>
+      <a href="#related">연결 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="overview">화면 개요</h2>
+    <p>최초 진입 시 해당 귀속년도 기준으로 <strong>재직중인 전체 사원</strong>이 자동 노출됩니다.</p>
+    <p>이 화면에서는 <strong>기본연차</strong>(기본 + 가산 + 1년 미만)에 대해서만 촉진 대상이 표시됩니다. 보상휴가, 대체휴가 등은 촉진 대상에서 제외됩니다.</p>
+
+    <div class="note-box">연차촉진은 근로기준법 제61조에 근거한 법적 절차입니다. 1차·2차 촉진을 모두 완료해야 미사용 연차에 대한 금전 보상 의무가 면제됩니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="search">검색 영역</h2>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>귀속년도</td>
+          <td>default는 당해년도입니다. 해당 귀속년도 기준의 촉진 대상자를 조회합니다.</td>
+        </tr>
+        <tr>
+          <td>검색</td>
+          <td>사원명 또는 부서명으로 like 검색합니다.</td>
+        </tr>
+        <tr>
+          <td>재직구분</td>
+          <td><strong>재직</strong>(default): 현재 재직중인 사원만 조회합니다.<br><strong>퇴직</strong>(2차): 퇴직자를 포함하여 조회합니다.</td>
+        </tr>
+        <tr>
+          <td>통보대상</td>
+          <td>
+            <strong>대상</strong>(default): 촉진 통보 대상자만 조회합니다.<br>
+            <strong>전체</strong>: 대상·제외 관계없이 전체 사원을 조회합니다.<br>
+            <strong>제외</strong>: 촉진 대상에서 제외된 사원만 조회합니다.<br><br>
+            제외 기준: 연차를 모두 소진한 사원 / 입사 1년 미만 중 촉진 비대상자(입사일로부터 9개월 미만) / 마이너스 연차 사용자
+          </td>
+        </tr>
+        <tr>
+          <td>연차재조회</td>
+          <td>화면 진입 시마다 최신 데이터를 재조회합니다. 다른 화면에서 연차 변동이 발생한 경우 이 버튼을 눌러 최신 상태를 반영합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="scope">촉진 대상 휴가 범위</h2>
+    <p>연차촉진의 대상이 되는 휴가 유형은 법정 연차유급휴가에 한정됩니다.</p>
+
+    <div class="key-box">
+      <strong>촉진 대상 휴가</strong><br>
+      &bull; <strong>법정 연차 유급휴가</strong>: 1년간 80% 이상 출근 시 15일 부여<br>
+      &bull; <strong>1년 미만 유급휴가</strong>: 매월 1개씩 최대 11일 부여<br>
+      &bull; <strong>가산 연차</strong>: 근속연수에 따라 2년마다 1일 추가 (최대 25일)<br><br>
+      <strong>촉진 제외 휴가</strong><br>
+      &bull; 연장·야간·휴일근로에 대한 보상휴가 및 대체휴가는 촉진 적용 대상에서 제외됩니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="tabs">1년 이상 / 1년 미만 탭</h2>
+    <p>촉진 대상자는 근속 기간에 따라 <strong>1년 이상</strong>과 <strong>1년 미만</strong> 두 개의 탭으로 구분됩니다. default는 1년 이상 탭입니다.</p>
+
+    <h3>리스트 컬럼</h3>
+    <table>
+      <thead>
+        <tr><th>컬럼</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>통보구분</strong></td><td>1차 촉진 또는 2차 촉진 구분을 표시합니다.</td></tr>
+        <tr><td><strong>상태</strong></td><td>현재 촉진 진행 상태를 표시합니다.</td></tr>
+        <tr><td><strong>부서</strong></td><td>사원의 소속 부서입니다.</td></tr>
+        <tr><td><strong>직급</strong></td><td>사원의 직급입니다.</td></tr>
+        <tr><td><strong>사원</strong></td><td>사원명을 표시합니다.</td></tr>
+        <tr><td><strong>재직구분</strong></td><td>재직 또는 퇴직 상태입니다.</td></tr>
+        <tr><td><strong>촉진기준일</strong></td><td>자동 계산된 촉진 기준일입니다.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>상태 흐름</h3>
+    <div class="grid-2" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="trigger-box t-red"><h3>제외</h3><p>촉진 대상 아님</p></div>
+      <div class="trigger-box"><h3>대기</h3><p>촉진 기준일 도래 전</p></div>
+      <div class="trigger-box t-orange"><h3>진행중</h3><p>통보 발송 후 회신 대기</p></div>
+      <div class="trigger-box t-green"><h3>미제출 / 제출완료</h3><p>회신 기한 경과 또는 제출</p></div>
+    </div>
+
+    <h3>촉진기준일 자동 계산</h3>
+    <div class="grid-2">
+      <div class="trigger-box t-teal">
+        <h3>1년 이상</h3>
+        <p><strong>1차 촉진</strong>: 연차사용 종료일로부터 6개월 전<br><strong>2차 촉진</strong>: 유효기간 만료일로부터 2개월 전</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>1년 미만</h3>
+        <p><strong>1차 촉진</strong>: 입사 1년 되기 3개월 전 (최초 9일분 대상)<br><strong>2차 촉진</strong>: 입사 1년 되기 1개월 전 (나머지 2일분 대상)</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="notify">통보 버튼</h2>
+    <p>촉진 대상자를 체크박스로 선택한 후 통보 버튼을 클릭하여 촉진 메일을 발송합니다.</p>
+
+    <h3>1차 통보</h3>
+    <ul>
+      <li>체크박스로 대상자를 선택한 후 클릭하면 1차 촉진 메일이 발송됩니다.</li>
+      <li>촉진기준일이 도래하지 않은 사원을 선택하고 클릭하면 경고 알럿이 표시됩니다.</li>
+    </ul>
+
+    <h3>2차 통보</h3>
+    <ul>
+      <li>default 상태에서는 <strong>비활성화</strong>되어 있습니다.</li>
+      <li>1차 통보 결과 <strong>미제출</strong> 상태인 사원에 대해서만 2차 통보 버튼이 활성화됩니다.</li>
+      <li>1차 촉진이 진행중인 사원을 선택하고 2차 통보를 클릭하면 경고 알럿이 표시됩니다.</li>
+    </ul>
+
+    <div class="important-box">1차 회신을 완료한 사원은 체크박스가 비활성화되어 추가 통보 대상에서 자동 제외됩니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="template">촉진 메일 발송 템플릿</h2>
+
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>1차 촉진 메일</h3>
+        <p>메일 본문 형태로 발송됩니다. 본문에 <strong>연차계획 등록 페이지 링크</strong> 버튼이 포함되어 있어, 직원이 클릭하면 연차 사용 계획을 직접 등록할 수 있습니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>2차 촉진 메일</h3>
+        <p>파일 첨부 형태로 발송됩니다.<br><br>
+        <strong>제목</strong>: 미사용 연차 유급휴가 사용시기 통보의 건<br>
+        <strong>내용</strong>: 근로기준법 제61조에 근거한 사용시기 지정 통보 문구<br>
+        <strong>첨부</strong>: 대상근로자 정보 + 연차지정일(팝업에서 선택한 일자)</p>
+      </div>
+    </div>
+
+    <div class="note-box">2차 촉진 메일 발송 시 팝업에서 연차 사용시기(지정일)를 선택해야 합니다. 선택한 일자가 첨부 문서에 포함되어 발송됩니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="related">연결 문서</h2>
+    <div class="nav-links">
+      <a href="연차촉진현황.html" target="_top">연차촉진현황 &rarr;</a>
+      <a href="월별연차현황.html" target="_top">월별 연차현황 &rarr;</a>
+      <a href="휴가부여조정.html" target="_top">휴가부여조정 &rarr;</a>
+      <a href="휴가이월정산.html" target="_top">휴가이월정산 &rarr;</a>
+    </div>
+  </div>
+
+  <button class="fab-toc" id="fabToc" title="목차 열기">&#9776;</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">화면 개요</a>
+    <a href="#search">검색 영역</a>
+    <a href="#scope">촉진 대상 휴가 범위</a>
+    <a href="#tabs">1년 이상 / 1년 미만 탭</a>
+    <a href="#notify">통보 버튼</a>
+    <a href="#template">촉진 메일 발송 템플릿</a>
+    <a href="#related">연결 문서</a>
+  </div>
+
+  <script>
+    if(window.self!==window.top)document.body.classList.add('in-iframe');
+    const fab=document.getElementById('fabToc'),ftoc=document.getElementById('floatToc');
+    fab.addEventListener('click',()=>{const o=ftoc.classList.toggle('show');fab.classList.toggle('active',o)});
+    document.addEventListener('click',e=>{if(!fab.contains(e.target)&&!ftoc.contains(e.target)){ftoc.classList.remove('show');fab.classList.remove('active')}});
+  </script>
+</body>
+</html>

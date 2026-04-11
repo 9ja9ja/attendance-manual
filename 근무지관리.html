@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근무지 관리 - 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root { --bg:#0d1117; --bg2:#161b22; --bg3:#1c2129; --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681; --blue:#58a6ff; --green:#3fb950; --orange:#d29922; --red:#f85149; --purple:#bc8cff; --teal:#39d9c1; --coral:#ea8a5e; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Pretendard', -apple-system, sans-serif; background:var(--bg); color:var(--text); }
+    .standalone-nav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0.65rem 1.5rem; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; }
+    .standalone-nav .back-btn { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:6px; font-size:0.8rem; font-weight:500; color:var(--blue); background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); text-decoration:none; transition:all .15s; }
+    .standalone-nav .back-btn:hover { background:rgba(88,166,255,0.15); }
+    .standalone-nav .page-title { font-size:0.85rem; font-weight:600; color:var(--text2); }
+    .standalone-nav .page-badge { font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:6px; background:rgba(63,185,80,0.12); color:var(--green); }
+    @media all { body.in-iframe .standalone-nav { display:none; } }
+    .mfg-content { max-width:960px; margin:0 auto; padding:2.5rem 2rem 4rem; }
+    .mfg-content h1 { font-size:1.8rem; font-weight:700; margin-bottom:.5rem; }
+    .mfg-content .subtitle { color:var(--text2); font-size:.95rem; margin-bottom:2rem; line-height:1.7; }
+    .mfg-content h2 { font-size:1.4rem; font-weight:700; margin:2.5rem 0 1rem; padding-bottom:.5rem; border-bottom:2px solid var(--border); }
+    .mfg-content h3 { font-size:1.15rem; font-weight:600; margin:1.5rem 0 .75rem; }
+    .mfg-content p { margin-bottom:.75rem; color:var(--text); font-size:.92rem; line-height:1.7; }
+    .mfg-content ul { margin:.5rem 0 1rem; padding-left:1.25rem; color:var(--text); }
+    .mfg-content li { font-size:.92rem; line-height:1.7; margin-bottom:.4rem; }
+    .section-divider { border:none; height:2px; background:linear-gradient(90deg, transparent, var(--border), transparent); margin:3rem 0; }
+    .toc { margin:1.5rem 0 2.5rem; padding:1.25rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; }
+    .toc-title { font-size:.85rem; font-weight:700; color:var(--text2); margin-bottom:.75rem; }
+    .toc a { color:var(--blue); text-decoration:none; font-size:.88rem; display:block; padding:3px 0; }
+    .toc a:hover { text-decoration:underline; }
+    .fab-toc { position:fixed; bottom:2rem; right:2rem; z-index:999; width:48px; height:48px; border-radius:50%; background:var(--blue); border:2px solid rgba(88,166,255,0.4); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.4); transition:transform .2s, box-shadow .2s; }
+    .fab-toc:hover { transform:scale(1.1); box-shadow:0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background:var(--bg3); border-color:var(--border); }
+    .float-toc { position:fixed; bottom:5.5rem; right:2rem; z-index:998; width:340px; max-height:70vh; overflow-y:auto; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1rem 1.25rem; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:none; }
+    .float-toc.show { display:block; animation:tocSlideIn .2s ease; }
+    @keyframes tocSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .float-toc .toc-title { font-size:.82rem; font-weight:700; color:var(--text2); margin-bottom:.6rem; }
+    .float-toc a { color:var(--blue); text-decoration:none; font-size:.82rem; display:block; padding:4px 0; }
+    .float-toc a:hover { text-decoration:underline; color:#fff; }
+    body.in-iframe .fab-toc { bottom:1.5rem; right:1.5rem; }
+    body.in-iframe .float-toc { bottom:4.5rem; right:1.5rem; }
+    .tag-row { display:flex; flex-wrap:wrap; gap:8px; margin:1rem 0; }
+    .tag { padding:5px 12px; border-radius:6px; font-size:.78rem; font-weight:500; background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); color:var(--blue); }
+    .nav-links { display:flex; gap:8px; flex-wrap:wrap; margin:1.5rem 0; }
+    .nav-links a { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:6px; font-size:.8rem; font-weight:500; color:var(--blue); background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); text-decoration:none; transition:all .15s; }
+    .nav-links a:hover { background:rgba(88,166,255,0.15); }
+    .note-box,.important-box,.key-box { border-radius:8px; padding:.85rem 1rem; margin:.75rem 0; line-height:1.7; font-size:.84rem; }
+    .note-box { background:rgba(210,153,34,0.08); border:1px solid rgba(210,153,34,0.2); color:var(--orange); }
+    .important-box { background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.2); color:var(--red); }
+    .key-box { background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.2); color:var(--green); }
+    .grid-2 { display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem; margin:1rem 0; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin:1rem 0; }
+    .trigger-box { background:var(--bg2); border:1px solid var(--border); border-left:4px solid var(--blue); border-radius:8px; padding:1rem 1.25rem; }
+    .trigger-box h3 { font-size:1rem; font-weight:600; margin:0 0 .5rem; color:var(--text); }
+    .trigger-box p { font-size:.85rem; color:var(--text2); margin:0; line-height:1.7; }
+    .trigger-box.t-green { border-left-color:var(--green); }
+    .trigger-box.t-purple { border-left-color:var(--purple); }
+    .trigger-box.t-orange { border-left-color:var(--orange); }
+    .trigger-box.t-red { border-left-color:var(--red); }
+    .trigger-box.t-teal { border-left-color:var(--teal); }
+    .trigger-box.t-coral { border-left-color:var(--coral); }
+    .flow-row { display:grid; grid-template-columns:repeat(5, 1fr); gap:.75rem; margin:1rem 0; }
+    .flow-step { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1rem; text-align:center; }
+    .flow-step strong { display:block; font-size:.85rem; font-weight:700; color:var(--blue); margin-bottom:.5rem; }
+    .flow-step p { font-size:.8rem; color:var(--text2); margin:0; line-height:1.6; }
+    table { width:100%; border-collapse:collapse; font-size:.85rem; margin:1rem 0; }
+    th { text-align:left; font-weight:600; font-size:.78rem; color:var(--text3); padding:8px 10px; border-bottom:2px solid var(--border); text-transform:uppercase; letter-spacing:.05em; }
+    td { padding:10px 10px; border-bottom:1px solid rgba(48,54,61,0.5); color:var(--text); line-height:1.7; vertical-align:top; }
+    .alert-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:.75rem 1rem; margin:.5rem 0; font-size:.85rem; line-height:1.7; }
+    .alert-box .alert-type { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-right:8px; background:rgba(248,81,73,0.12); color:var(--red); }
+    .alert-box .alert-type.confirm { background:rgba(210,153,34,0.12); color:var(--orange); }
+    .alert-box .alert-msg { color:var(--text2); font-style:italic; }
+    @media (max-width:768px) { .mfg-content { padding:1.5rem 1rem 3rem; } .mfg-content h1 { font-size:1.4rem; } .grid-2,.grid-3,.flow-row { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">인덱스로</a>
+    <span class="page-title">근무지 관리</span>
+    <span class="page-badge">Setup</span>
+  </nav>
+  <div class="mfg-content">
+    <h1>근무지 관리 화면은 출퇴근 허용 기준을 운영하는 목록 화면입니다</h1>
+    <p class="subtitle">근무지 관리는 단순 주소 목록이 아니라, 회사가 어떤 장소를 공식 근무지로 운영하고 있는지, 어떤 근무지가 신규 직원 배포 기준인지, 어떤 근무지를 삭제하거나 미사용 처리할 수 있는지를 판단하는 관리 화면입니다. 실제 세부 값은 설정 화면에서 입력하더라도, 운영 상태를 점검하고 정리하는 중심 화면은 이 목록 화면입니다.</p>
+    <div class="tag-row">
+      <span class="tag">메뉴: 근무지 관리</span>
+      <span class="tag">대상: 관리자</span>
+      <span class="tag">역할: 목록 조회, 운영 판단, 삭제/미사용 관리</span>
+      <span class="tag">연결: 근무지 설정, 직원 근태, 월마감</span>
+    </div>
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">화면 개요</a>
+      <a href="#flow">업무 흐름 요약</a>
+      <a href="#search">검색 영역</a>
+      <a href="#buttons">상단 버튼과 일괄 작업</a>
+      <a href="#columns">조회 목록 컬럼 상세</a>
+      <a href="#policy">대표 근무지 / 사용 여부 운영 규칙</a>
+      <a href="#alerts">삭제 / 미사용 / 일부삭제 컨펌과 얼럿</a>
+      <a href="#checklist">운영자가 이 화면에서 최종 확인해야 할 것</a>
+      <a href="#related">함께 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+    <h2 id="overview">화면 개요</h2>
+    <p>이 화면은 등록된 근무지를 한눈에 모아 보고, 현재 운영 중인 기준 근무지가 적절한지 점검하는 화면입니다. 특히 대표 근무지, 사용 인원, 사용 여부가 함께 보이기 때문에, 운영자는 이 화면에서 단순 조회가 아니라 유지할지, 바꿀지, 정리할지를 판단하게 됩니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>관리 허브 역할</h3>
+        <p>근무지 등록 자체는 설정 화면으로 이어지지만, 전체 현황 파악과 상태 점검은 이 화면에서 이뤄집니다. 그래서 근무지 관리 화면은 근무지 운영의 시작점이자 통제 화면입니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>직원 적용과의 연결</h3>
+        <p>이곳에서 보이는 대표 근무지와 사용 여부는 신규 직원 기본 배포와 기존 직원 유지 정책으로 이어집니다. 근무지 정보는 직원 출퇴근 인정 방식의 기준이기도 합니다.</p>
+      </div>
+    </div>
+    <div class="key-box">목록 화면은 결과 화면이 아니라 운영 화면입니다. 어떤 근무지를 계속 사용할지, 어떤 근무지를 더 이상 신규 배포하지 않을지 판단하는 역할이 가장 중요합니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="flow">업무 흐름 요약</h2>
+    <div class="flow-row">
+      <div class="flow-step"><strong>목록 진입</strong><p>기본 조건으로 자동 조회해 현재 등록 현황을 확인합니다.</p></div>
+      <div class="flow-step"><strong>검색 / 점검</strong><p>명칭 또는 주소 기준으로 필요한 근무지를 찾아 상태를 점검합니다.</p></div>
+      <div class="flow-step"><strong>등록 / 수정 이동</strong><p>신규 근무지는 등록으로, 기존 근무지는 상세 수정으로 이어집니다.</p></div>
+      <div class="flow-step"><strong>삭제 / 미사용 판단</strong><p>사용 인원과 대표 여부를 기준으로 정리 가능성을 판단합니다.</p></div>
+      <div class="flow-step"><strong>직원 영향 확인</strong><p>신규 배포와 기존 직원 유지에 영향이 없는지 최종 확인합니다.</p></div>
+    </div>
+
+    <hr class="section-divider">
+    <h2 id="search">검색 영역</h2>
+    <p>근무지 목록은 화면 진입 시 기본 조건으로 자동 조회됩니다. 별도 검색어를 넣지 않아도 현재 운영 중인 근무지 현황을 바로 확인할 수 있어야 하기 때문입니다. 검색은 특정 근무지를 찾는 기능이면서, 중복 근무지 여부를 점검하는 수단이기도 합니다.</p>
+    <table>
+      <thead><tr><th>항목</th><th>기준</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td><strong>최초 진입</strong></td><td>기본값 자동 조회</td><td>화면이 열리면 현재 목록이 자동으로 조회되어 빈 화면 없이 바로 점검할 수 있습니다.</td></tr>
+        <tr><td><strong>검색 구분</strong></td><td>전체 / 명칭 / 주소</td><td>검색 드롭다운을 통해 어떤 기준으로 찾을지 선택합니다.</td></tr>
+        <tr><td><strong>검색어 입력</strong></td><td>부분 일치 검색</td><td>근무지명 또는 주소 일부만 입력해도 원하는 대상을 찾을 수 있습니다.</td></tr>
+        <tr><td><strong>조건 없는 조회</strong></td><td>전체 조회</td><td>검색어가 없으면 등록된 근무지를 전체 기준으로 보여줍니다.</td></tr>
+        <tr><td><strong>결과 없음</strong></td><td>안내 문구 노출</td><td>조회 결과가 없을 때는 결과 없음 메시지를 표시해 조건 불일치 상황을 분명히 보여줍니다.</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">주소 기준 검색은 같은 장소가 다른 이름으로 중복 등록되는 것을 줄이는 데 특히 유용합니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="buttons">상단 버튼과 일괄 작업</h2>
+    <p>상단 버튼은 근무지 운영에 필요한 주요 작업을 빠르게 실행하는 장치입니다. 다만 버튼을 누르기 전에, 사용 인원과 대표 근무지 여부를 먼저 확인하는 것이 운영상 더 중요합니다.</p>
+    <div class="grid-3">
+      <div class="trigger-box"><h3>등록</h3><p>새로운 사업장, 지점, 현장을 근무지로 추가할 때 사용합니다. 실제 세부 입력은 설정 화면에서 진행합니다.</p></div>
+      <div class="trigger-box t-purple"><h3>수정</h3><p>기존 근무지의 주소, 반경, 체크 방식, 대표 여부를 바꿔야 할 때 사용합니다.</p></div>
+      <div class="trigger-box t-red"><h3>삭제</h3><p>더 이상 운영하지 않는 근무지를 제거할 때 사용하지만, 사용 인원과 대표 여부에 따라 제한될 수 있습니다.</p></div>
+      <div class="trigger-box t-teal"><h3>복사</h3><p>유사한 설정을 가진 근무지를 빠르게 추가할 때 사용합니다. 여러 지점이 비슷한 기준을 공유할 때 유용합니다.</p></div>
+      <div class="trigger-box t-orange"><h3>출력</h3><p>현황 점검 자료나 운영 회의 자료로 활용할 수 있도록 현재 조회 결과를 출력합니다.</p></div>
+      <div class="trigger-box t-coral"><h3>엑셀 다운로드 / 업로드</h3><p>초기 구축, 대량 정비, 대규모 점검에 사용하는 기능입니다. 업로드 전에는 대표 근무지와 사용 여부 기준을 먼저 정리해야 합니다.</p></div>
+    </div>
+    <p>상단에는 전체 건수와 선택 건수가 함께 표시됩니다. 전체 건수는 운영 범위를, 선택 건수는 일괄 작업 대상 수를 보여주므로 삭제나 복사 전 확인이 필요합니다.</p>
+
+    <hr class="section-divider">
+    <h2 id="columns">조회 목록 컬럼 상세</h2>
+    <table>
+      <thead><tr><th>컬럼</th><th>의미</th><th>운영 포인트</th></tr></thead>
+      <tbody>
+        <tr><td><strong>근무지명</strong></td><td>관리자가 식별하기 위해 부여한 근무지 이름입니다.</td><td>직원 배포와 운영 커뮤니케이션에 그대로 쓰이므로 명확해야 합니다.</td></tr>
+        <tr><td><strong>근무지 주소</strong></td><td>해당 근무지의 기준 주소입니다.</td><td>GPS 위치 반경 기준과 직접 연결됩니다.</td></tr>
+        <tr><td><strong>IP 주소 대역</strong></td><td>WEB IP 방식으로 허용한 네트워크 범위를 보여줍니다.</td><td>사무실 출근 인정 환경 점검 시 가장 먼저 보는 값입니다.</td></tr>
+        <tr><td><strong>WIFI</strong></td><td>WIFI 방식으로 허용한 무선 네트워크 정보를 보여줍니다.</td><td>현장 또는 이동 근무지 운영 시 중요한 값입니다.</td></tr>
+        <tr><td><strong>사용 인원</strong></td><td>현재 이 근무지를 사용 중인 직원 수입니다.</td><td>삭제 가능 여부와 미사용 전환 영향 범위를 판단하는 핵심 정보입니다.</td></tr>
+        <tr><td><strong>비고</strong></td><td>운영상 참고할 메모입니다.</td><td>특수 현장, 고객사 상주, 임시 사무실처럼 추가 설명이 필요한 경우 활용합니다.</td></tr>
+        <tr><td><strong>사용 여부</strong></td><td>신규 배포 대상으로 계속 사용할지 여부입니다.</td><td>미사용 전환은 삭제보다 안전한 정리 방식으로 자주 사용됩니다.</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+    <h2 id="policy">대표 근무지 / 사용 여부 운영 규칙</h2>
+    <h3>대표 근무지</h3>
+    <p>대표 근무지는 신규 직원에게 기본으로 연결되는 근무지입니다. 따라서 대표 근무지는 단순 표시값이 아니라 조직의 기본 출퇴근 기준을 의미합니다.</p>
+    <ul>
+      <li>대표 근무지는 목록 최상단에 배치됩니다.</li>
+      <li>대표 근무지는 삭제 대상에서 제외됩니다.</li>
+      <li>대표 근무지가 바뀌면 신규 배포 기준도 함께 바뀝니다.</li>
+    </ul>
+    <h3>사용 여부</h3>
+    <p>사용 여부는 과거 이력을 지우는 기능이 아니라, 앞으로 신규 배포 기준으로 계속 쓸 것인지를 정하는 상태값입니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-green"><h3>사용</h3><p>신규 직원 배포 대상에 포함되며 현재 운영 중인 근무지로 관리됩니다.</p></div>
+      <div class="trigger-box t-orange"><h3>미사용</h3><p>신규 배포에서는 제외되지만 기존 직원과 과거 이력은 유지됩니다. 삭제 전에 단계적으로 정리할 때 적합합니다.</p></div>
+    </div>
+    <div class="important-box">사용 인원이 있는 근무지를 바로 삭제하기보다, 먼저 미사용으로 전환하고 배포 기준을 다른 근무지로 옮긴 뒤 정리하는 것이 더 안전한 운영 방식입니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="alerts">삭제 / 미사용 / 일부삭제 컨펌과 얼럿</h2>
+    <p>목록 화면의 메시지는 단순 경고가 아니라 운영 기준을 지키게 하는 정책 장치입니다. 특히 사용 인원 존재 여부, 대표 근무지 여부, 일괄 삭제 가능 범위에 따라 서로 다른 안내가 표시됩니다.</p>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">사용 중인 직원이 있는 근무지는 삭제할 수 없습니다.</span></div>
+    <p>운영 의미: 이미 직원에게 배포된 근무지가 갑자기 사라지지 않도록 막아 출퇴근 인정 기준의 혼선을 방지합니다.</p>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">사용 인원이 있는 근무지를 미사용으로 변경하려면 영향 범위를 확인해야 합니다.</span></div>
+    <p>운영 의미: 미사용 전환은 가능하더라도, 현재 배포된 직원이 있는지 먼저 점검해야 함을 안내합니다.</p>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">대표 근무지는 삭제할 수 없습니다.</span></div>
+    <p>운영 의미: 대표 근무지는 신규 직원 기본 배포 기준이므로 별도 대표 변경 없이 제거되지 않도록 보호합니다.</p>
+    <div class="alert-box"><span class="alert-type confirm">확인</span><span class="alert-msg">삭제 가능한 근무지 N건을 삭제하시겠습니까.</span></div>
+    <p>운영 의미: 여러 건 삭제 시 실제 처리 건수를 다시 확인하게 해 일괄 삭제 실수를 줄입니다.</p>
+    <div class="alert-box"><span class="alert-type confirm">확인</span><span class="alert-msg">선택 건 중 삭제 가능한 대상만 삭제합니다.</span></div>
+    <p>운영 의미: 일부만 삭제 가능한 상황을 분리해 보여주어, 왜 모든 선택 건이 처리되지 않았는지 이해할 수 있게 합니다.</p>
+
+    <hr class="section-divider">
+    <h2 id="checklist">운영자가 이 화면에서 최종 확인해야 할 것</h2>
+    <div class="grid-2">
+      <div class="trigger-box"><h3>대표 근무지가 적절한가</h3><p>신규 직원 기본 배포 기준으로 사용할 근무지가 맞는지 확인합니다.</p></div>
+      <div class="trigger-box t-purple"><h3>미사용 전환 대상이 맞는가</h3><p>더 이상 신규 배포가 필요 없는 근무지인지, 아직 운영 중인지를 구분합니다.</p></div>
+      <div class="trigger-box t-teal"><h3>사용 인원이 남아 있는가</h3><p>삭제 또는 미사용 전환 전에 현재 배포된 직원 수를 반드시 확인합니다.</p></div>
+      <div class="trigger-box t-coral"><h3>중복 근무지가 없는가</h3><p>명칭과 주소 기준으로 유사한 근무지가 여러 번 등록되지 않았는지 점검합니다.</p></div>
+    </div>
+    <div class="key-box">이 화면의 핵심은 버튼 조작보다 운영 판단입니다. 목록을 보고 지금 유지해야 할 근무지와 정리해도 되는 근무지를 가르는 것이 가장 중요합니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="related">함께 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="근무지설정.html" target="_top">근무지 설정 로직 →</a>
+      <a href="직원근태.html" target="_top">직원 근태 →</a>
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간·월마감 →</a>
+    </div>
+  </div>
+  <button class="fab-toc" id="fabToc" title="목차 열기">≡</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">화면 개요</a>
+    <a href="#flow">업무 흐름 요약</a>
+    <a href="#search">검색 영역</a>
+    <a href="#buttons">상단 버튼과 일괄 작업</a>
+    <a href="#columns">조회 목록 컬럼 상세</a>
+    <a href="#policy">대표 근무지 / 사용 여부 운영 규칙</a>
+    <a href="#alerts">삭제 / 미사용 / 일부삭제 컨펌과 얼럿</a>
+    <a href="#checklist">운영자가 이 화면에서 최종 확인해야 할 것</a>
+    <a href="#related">함께 보면 좋은 문서</a>
+  </div>
+  <script>
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

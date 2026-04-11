@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근무지 설정 로직 - 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root { --bg:#0d1117; --bg2:#161b22; --bg3:#1c2129; --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681; --blue:#58a6ff; --green:#3fb950; --orange:#d29922; --red:#f85149; --purple:#bc8cff; --teal:#39d9c1; --coral:#ea8a5e; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Pretendard', -apple-system, sans-serif; background:var(--bg); color:var(--text); }
+    .standalone-nav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0.65rem 1.5rem; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; }
+    .standalone-nav .back-btn { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:6px; font-size:0.8rem; font-weight:500; color:var(--blue); background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); text-decoration:none; transition:all .15s; }
+    .standalone-nav .back-btn:hover { background:rgba(88,166,255,0.15); }
+    .standalone-nav .page-title { font-size:0.85rem; font-weight:600; color:var(--text2); }
+    .standalone-nav .page-badge { font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:6px; background:rgba(63,185,80,0.12); color:var(--green); }
+    @media all { body.in-iframe .standalone-nav { display:none; } }
+    .mfg-content { max-width:960px; margin:0 auto; padding:2.5rem 2rem 4rem; }
+    .mfg-content h1 { font-size:1.8rem; font-weight:700; margin-bottom:.5rem; }
+    .mfg-content .subtitle { color:var(--text2); font-size:.95rem; margin-bottom:2rem; line-height:1.7; }
+    .mfg-content h2 { font-size:1.4rem; font-weight:700; margin:2.5rem 0 1rem; padding-bottom:.5rem; border-bottom:2px solid var(--border); }
+    .mfg-content h3 { font-size:1.15rem; font-weight:600; margin:1.5rem 0 .75rem; }
+    .mfg-content p { margin-bottom:.75rem; color:var(--text); font-size:.92rem; line-height:1.7; }
+    .mfg-content ul { margin:.5rem 0 1rem; padding-left:1.25rem; color:var(--text); }
+    .mfg-content li { font-size:.92rem; line-height:1.7; margin-bottom:.4rem; }
+    .section-divider { border:none; height:2px; background:linear-gradient(90deg, transparent, var(--border), transparent); margin:3rem 0; }
+    .toc { margin:1.5rem 0 2.5rem; padding:1.25rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; }
+    .toc-title { font-size:.85rem; font-weight:700; color:var(--text2); margin-bottom:.75rem; }
+    .toc a { color:var(--blue); text-decoration:none; font-size:.88rem; display:block; padding:3px 0; }
+    .toc a:hover { text-decoration:underline; }
+    .fab-toc { position:fixed; bottom:2rem; right:2rem; z-index:999; width:48px; height:48px; border-radius:50%; background:var(--blue); border:2px solid rgba(88,166,255,0.4); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.4); transition:transform .2s, box-shadow .2s; }
+    .fab-toc:hover { transform:scale(1.1); box-shadow:0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background:var(--bg3); border-color:var(--border); }
+    .float-toc { position:fixed; bottom:5.5rem; right:2rem; z-index:998; width:340px; max-height:70vh; overflow-y:auto; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1rem 1.25rem; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:none; }
+    .float-toc.show { display:block; animation:tocSlideIn .2s ease; }
+    @keyframes tocSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .float-toc .toc-title { font-size:.82rem; font-weight:700; color:var(--text2); margin-bottom:.6rem; }
+    .float-toc a { color:var(--blue); text-decoration:none; font-size:.82rem; display:block; padding:4px 0; }
+    .float-toc a:hover { text-decoration:underline; color:#fff; }
+    body.in-iframe .fab-toc { bottom:1.5rem; right:1.5rem; }
+    body.in-iframe .float-toc { bottom:4.5rem; right:1.5rem; }
+    .tag-row { display:flex; flex-wrap:wrap; gap:8px; margin:1rem 0; }
+    .tag { padding:5px 12px; border-radius:6px; font-size:.78rem; font-weight:500; background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); color:var(--blue); }
+    .nav-links { display:flex; gap:8px; flex-wrap:wrap; margin:1.5rem 0; }
+    .nav-links a { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:6px; font-size:.8rem; font-weight:500; color:var(--blue); background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); text-decoration:none; transition:all .15s; }
+    .nav-links a:hover { background:rgba(88,166,255,0.15); }
+    .note-box,.important-box,.key-box { border-radius:8px; padding:.85rem 1rem; margin:.75rem 0; line-height:1.7; font-size:.84rem; }
+    .note-box { background:rgba(210,153,34,0.08); border:1px solid rgba(210,153,34,0.2); color:var(--orange); }
+    .important-box { background:rgba(248,81,73,0.08); border:1px solid rgba(248,81,73,0.2); color:var(--red); }
+    .key-box { background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.2); color:var(--green); }
+    .grid-2 { display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem; margin:1rem 0; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin:1rem 0; }
+    .trigger-box { background:var(--bg2); border:1px solid var(--border); border-left:4px solid var(--blue); border-radius:8px; padding:1rem 1.25rem; }
+    .trigger-box h3 { font-size:1rem; font-weight:600; margin:0 0 .5rem; color:var(--text); }
+    .trigger-box p { font-size:.85rem; color:var(--text2); margin:0; line-height:1.7; }
+    .trigger-box.t-green { border-left-color:var(--green); }
+    .trigger-box.t-purple { border-left-color:var(--purple); }
+    .trigger-box.t-teal { border-left-color:var(--teal); }
+    .trigger-box.t-orange { border-left-color:var(--orange); }
+    .trigger-box.t-coral { border-left-color:var(--coral); }
+    .flow-row { display:grid; grid-template-columns:repeat(6, 1fr); gap:.75rem; margin:1rem 0; }
+    .flow-step { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1rem; text-align:center; }
+    .flow-step strong { display:block; font-size:.85rem; font-weight:700; color:var(--blue); margin-bottom:.5rem; }
+    .flow-step p { font-size:.8rem; color:var(--text2); margin:0; line-height:1.6; }
+    table { width:100%; border-collapse:collapse; font-size:.85rem; margin:1rem 0; }
+    th { text-align:left; font-weight:600; font-size:.78rem; color:var(--text3); padding:8px 10px; border-bottom:2px solid var(--border); text-transform:uppercase; letter-spacing:.05em; }
+    td { padding:10px 10px; border-bottom:1px solid rgba(48,54,61,0.5); color:var(--text); line-height:1.7; vertical-align:top; }
+    .alert-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:.75rem 1rem; margin:.5rem 0; font-size:.85rem; line-height:1.7; }
+    .alert-box .alert-type { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-right:8px; background:rgba(248,81,73,0.12); color:var(--red); }
+    .alert-box .alert-type.confirm { background:rgba(210,153,34,0.12); color:var(--orange); }
+    .alert-box .alert-msg { color:var(--text2); font-style:italic; }
+    @media (max-width:768px) { .mfg-content { padding:1.5rem 1rem 3rem; } .mfg-content h1 { font-size:1.4rem; } .grid-2,.grid-3,.flow-row { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">인덱스로</a>
+    <span class="page-title">근무지 설정 로직</span>
+    <span class="page-badge">Setup</span>
+  </nav>
+  <div class="mfg-content">
+    <h1>근무지 설정 화면은 출퇴근 인정 기준을 실제로 만드는 입력 화면입니다</h1>
+    <p class="subtitle">근무지 설정은 주소를 입력하는 화면이 아니라, 직원이 어디에서 어떤 방식으로 출퇴근을 인정받을 수 있는지를 결정하는 화면입니다. GPS, WEB IP, WIFI 방식 선택에 따라 허용 범위가 달라지고, 대표 근무지 여부에 따라 신규 직원 기본 배포 기준도 달라집니다. 따라서 이 화면은 입력 화면이면서 동시에 출퇴근 인정 정책을 구성하는 화면으로 이해해야 합니다.</p>
+    <div class="tag-row">
+      <span class="tag">메뉴: 근무지 등록 / 수정</span>
+      <span class="tag">대상: 관리자</span>
+      <span class="tag">역할: 기준값 입력, 검증, 저장</span>
+      <span class="tag">연결: 직원 출퇴근 인정 방식</span>
+    </div>
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">설정 화면 개요</a>
+      <a href="#flow">등록/수정 흐름</a>
+      <a href="#common-fields">공통 입력 필드</a>
+      <a href="#check-logic">출퇴근 체크 방식 설정 로직</a>
+      <a href="#gps">주소 / 좌표 / 반경 설정</a>
+      <a href="#webip">WEB IP 설정</a>
+      <a href="#wifi">WIFI 설정</a>
+      <a href="#representative">대표 근무지 설정 규칙</a>
+      <a href="#save-policy">저장 / 취소 / 검증 / 필수값 얼럿</a>
+      <a href="#impact">직원 출퇴근 적용 영향</a>
+      <a href="#checklist">운영 체크리스트</a>
+      <a href="#related">함께 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+    <h2 id="overview">설정 화면 개요</h2>
+    <p>근무지 설정 화면은 근무지 목록에서 등록 또는 수정을 선택했을 때 열리는 상세 입력 화면입니다. 이 화면에서 입력한 값은 직원 출퇴근 허용 장소, 허용 네트워크, GPS 반경 기준, 신규 직원 기본 근무지 기준으로 이어집니다. 따라서 정확한 값 입력과 저장 전 검증이 중요합니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box"><h3>등록 화면의 역할</h3><p>새 근무지를 만들 때 필요한 기본 정보와 출퇴근 인정 방식을 입력합니다. 사무실, 지점, 현장, 상주 장소처럼 근무 형태가 다른 곳도 같은 흐름 안에서 관리합니다.</p></div>
+      <div class="trigger-box t-green"><h3>수정 화면의 역할</h3><p>이미 등록된 근무지의 주소, 반경, IP, WIFI, 대표 여부를 변경합니다. 이미 직원에게 배포된 근무지일 수 있으므로 변경 영향도 함께 검토해야 합니다.</p></div>
+    </div>
+
+    <hr class="section-divider">
+    <h2 id="flow">등록/수정 흐름</h2>
+    <div class="flow-row">
+      <div class="flow-step"><strong>진입</strong><p>목록에서 등록 또는 수정으로 이동합니다.</p></div>
+      <div class="flow-step"><strong>기본 정보 입력</strong><p>근무지명, 주소, 비고, 대표 여부를 입력합니다.</p></div>
+      <div class="flow-step"><strong>체크 방식 선택</strong><p>GPS, WEB IP, WIFI 중 필요한 방식을 선택합니다.</p></div>
+      <div class="flow-step"><strong>세부 값 입력</strong><p>좌표, 반경, IP 대역, WIFI 정보를 입력합니다.</p></div>
+      <div class="flow-step"><strong>검증</strong><p>필수값 누락과 형식 오류를 확인합니다.</p></div>
+      <div class="flow-step"><strong>저장 완료</strong><p>저장 후 목록과 직원 적용 기준에 반영됩니다.</p></div>
+    </div>
+
+    <hr class="section-divider">
+    <h2 id="common-fields">공통 입력 필드</h2>
+    <table>
+      <thead><tr><th>필드</th><th>입력 규칙</th><th>운영 의미</th></tr></thead>
+      <tbody>
+        <tr><td><strong>근무지명</strong></td><td>필수 입력, 최대 50자</td><td>직원과 관리자 모두가 보는 이름이므로 장소를 쉽게 구분할 수 있어야 합니다.</td></tr>
+        <tr><td><strong>대표 근무지</strong></td><td>선택 항목, 최초 등록 시 1건 필요</td><td>신규 직원 기본 배포 기준으로 사용됩니다.</td></tr>
+        <tr><td><strong>주소</strong></td><td>우편번호, 기본 주소, 상세주소 구분 입력</td><td>GPS 위치 기준과 근무지 식별의 기본값이 됩니다.</td></tr>
+        <tr><td><strong>비고</strong></td><td>최대 100자</td><td>현장 특이사항, 고객사 상주 등 운영 메모를 남길 때 사용합니다.</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">공통 입력 필드는 나중에 어떤 체크 방식을 쓰더라도 반드시 기준이 되는 값입니다. 이름과 주소가 불명확하면 운영 단계에서 혼선이 생기기 쉽습니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="check-logic">출퇴근 체크 방식 설정 로직</h2>
+    <p>출퇴근 체크 방식은 이 근무지에서 어떤 조건으로 타각을 인정할 것인지 정하는 핵심 설정입니다. 화면에 처음 들어왔을 때는 관련 입력 영역이 비활성 상태로 보이고, GPS, WEB IP, WIFI를 선택하면 각 방식에 맞는 세부 입력 영역이 열립니다.</p>
+    <div class="grid-3">
+      <div class="trigger-box"><h3>GPS</h3><p>좌표와 반경을 기준으로 특정 위치 안에서만 출퇴근을 허용합니다. 지점, 현장, 사옥처럼 물리적 위치가 분명한 장소에 적합합니다.</p></div>
+      <div class="trigger-box t-purple"><h3>WEB IP</h3><p>등록된 IP 대역 안에서만 출퇴근을 허용합니다. 고정 회선을 사용하는 사무실 환경에 적합합니다.</p></div>
+      <div class="trigger-box t-teal"><h3>WIFI</h3><p>등록된 WIFI 환경 안에서만 출퇴근을 허용합니다. 모바일 출퇴근이나 현장 무선 네트워크 환경 관리에 유용합니다.</p></div>
+    </div>
+    <div class="key-box">체크 방식은 단순 설명 문구가 아니라 직원 화면에 그대로 반영되는 운영 기준입니다. 어떤 방식이 실제 사용 환경에 맞는지 먼저 정한 뒤 세부값을 입력해야 합니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="gps">주소 / 좌표 / 반경 설정</h2>
+    <h3>주소</h3>
+    <p>주소는 우편번호와 기본 주소, 상세주소로 나누어 관리합니다. 주소 검색을 통해 기준 주소를 불러오고, 필요한 경우 상세주소를 추가합니다.</p>
+    <ul>
+      <li>주소 검색 기능을 통해 기준 주소를 선택합니다.</li>
+      <li>기본 주소와 상세주소를 구분해 관리합니다.</li>
+      <li>주소가 정해지면 지도와 좌표 기준도 함께 정리됩니다.</li>
+    </ul>
+    <h3>좌표</h3>
+    <p>좌표는 주소 검색 결과나 지도 마커 선택에 따라 자동으로 정해집니다. 숫자를 직접 손으로 입력하기보다, 위치 선택 결과를 기준으로 관리하는 방식이 더 자연스럽습니다.</p>
+    <ul>
+      <li>주소 또는 지도 선택 결과로 좌표가 자동 반영됩니다.</li>
+      <li>마커를 이동하면 위치 기준이 갱신됩니다.</li>
+      <li>주소가 없는 상태에서는 브라우저 위치 기준이 사용될 수 있습니다.</li>
+    </ul>
+    <h3>반경</h3>
+    <table>
+      <thead><tr><th>항목</th><th>설정 기준</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td><strong>기본값</strong></td><td>50</td><td>최초 입력 시 제시되는 기본 반경입니다.</td></tr>
+        <tr><td><strong>입력 형식</strong></td><td>숫자만 입력</td><td>반경은 숫자 기반 값으로 관리합니다.</td></tr>
+        <tr><td><strong>최소 기준</strong></td><td>50 미만 불가</td><td>너무 좁은 반경으로 인해 정상 출근이 반복 실패하지 않도록 최소 기준을 둡니다.</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">지도 마커를 옮기면 좌표와 주소가 다시 정리될 수 있습니다. 다만 상세주소는 운영 메모 성격이 강하므로 별도 확인이 필요합니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="webip">WEB IP 설정</h2>
+    <p>WEB IP는 특정 네트워크 대역 안에서만 출퇴근을 허용하는 방식입니다. 일반적으로 사무실 PC 환경처럼 네트워크가 비교적 고정된 경우에 적합합니다.</p>
+    <ul>
+      <li>점으로 구분된 IP 형식인지 검증합니다.</li>
+      <li>각 자리 수는 0~255 범위인지 확인합니다.</li>
+      <li>현재 접속 중인 IP를 자동으로 입력할 수 있습니다.</li>
+      <li>여러 대역이 필요하면 행을 추가해 다중 등록합니다.</li>
+    </ul>
+    <div class="important-box">WEB IP는 관리가 편리하지만 회선 교체나 사무실 이전이 있으면 값 정비가 필요합니다. 네트워크 변경 시 출퇴근이 갑자기 실패할 수 있기 때문입니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="wifi">WIFI 설정</h2>
+    <p>WIFI는 특정 무선 네트워크 환경 안에서만 출퇴근을 허용하는 방식입니다. 현장, 이동 근무지, 소규모 지점처럼 모바일 출퇴근 비중이 높은 경우에 유용합니다.</p>
+    <ul>
+      <li>허용 형식에 맞는 WIFI 정보인지 검증합니다.</li>
+      <li>현재 접속 중인 WIFI 정보를 자동으로 채울 수 있습니다.</li>
+      <li>필요하면 여러 행으로 추가 등록합니다.</li>
+    </ul>
+    <div class="note-box">WIFI는 현장 사정에 따라 자주 바뀔 수 있으므로, 실제 사용 환경과 등록 정보가 일치하는지 주기적으로 점검하는 것이 좋습니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="representative">대표 근무지 설정 규칙</h2>
+    <p>대표 근무지는 신규 직원에게 기본으로 배포되는 기준 근무지입니다. 따라서 단순 체크 항목이 아니라 회사의 기본 출퇴근 기준을 정하는 설정입니다.</p>
+    <ul>
+      <li>최초 등록 단계에서는 대표 근무지가 반드시 존재해야 합니다.</li>
+      <li>기존 대표 근무지를 다른 근무지로 바꿀 때는 확인 메시지를 거칩니다.</li>
+      <li>대표 근무지 변경은 신규 배포 기준 변경과 연결되므로 신중한 검토가 필요합니다.</li>
+    </ul>
+    <div class="alert-box"><span class="alert-type confirm">확인</span><span class="alert-msg">대표 근무지를 변경하시겠습니까.</span></div>
+    <p>운영 의미: 대표 근무지는 신규 입사자 기본값과 연결되므로, 실수로 잘못 바꾸지 않도록 다시 한번 확인합니다.</p>
+
+    <hr class="section-divider">
+    <h2 id="save-policy">저장 / 취소 / 검증 / 필수값 얼럿</h2>
+    <h3>저장과 취소</h3>
+    <ul>
+      <li>변경사항이 없으면 닫기 또는 취소 시 바로 종료됩니다.</li>
+      <li>변경사항이 있으면 저장 없이 나갈지 다시 확인합니다.</li>
+    </ul>
+    <div class="alert-box"><span class="alert-type confirm">확인</span><span class="alert-msg">변경사항을 저장하지 않고 나가시겠습니까.</span></div>
+    <p>운영 의미: 관리자 실수로 입력값을 잃지 않도록 보호합니다.</p>
+    <h3>필수값 및 저장 결과</h3>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">필수 입력값을 확인해 주세요.</span></div>
+    <p>운영 의미: 근무지명, 주소, 필요한 체크 방식 값이 비어 있는 상태로 저장되지 않도록 막습니다.</p>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">저장이 완료되었습니다.</span></div>
+    <p>운영 의미: 등록 또는 수정이 정상 반영되었음을 명확히 알려줍니다.</p>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">대표 근무지를 지정해 주세요.</span></div>
+    <p>운영 의미: 시스템 전체 기본 배포 기준이 비어 있지 않도록 보장합니다.</p>
+    <h3>상세 조회 / 수정 / 삭제 흐름</h3>
+    <ul>
+      <li>저장된 근무지는 상세 조회 후 수정 화면으로 이어집니다.</li>
+      <li>단건 삭제도 상세 화면에서 수행할 수 있습니다.</li>
+      <li>다만 사용 중인 직원이 있으면 단건 삭제도 제한됩니다.</li>
+    </ul>
+    <div class="alert-box"><span class="alert-type confirm">확인</span><span class="alert-msg">이 근무지를 삭제하시겠습니까.</span></div>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">삭제가 완료되었습니다.</span></div>
+    <div class="alert-box"><span class="alert-type">안내</span><span class="alert-msg">사용 중인 직원이 있어 삭제할 수 없습니다.</span></div>
+    <p>운영 의미: 어느 화면에서 삭제를 시도하더라도 같은 운영 원칙을 유지하도록 설계되어 있습니다.</p>
+
+    <hr class="section-divider">
+    <h2 id="impact">직원 출퇴근 적용 영향</h2>
+    <p>근무지 설정값은 저장 후 직원의 출퇴근 인정 방식에 직접 영향을 줍니다. 따라서 이 화면은 관리자용 입력 화면이면서, 동시에 직원 출퇴근 정책을 정하는 화면이기도 합니다.</p>
+    <table>
+      <thead><tr><th>설정값</th><th>직원에게 미치는 영향</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GPS</strong></td><td>등록된 좌표와 반경 안에서만 출퇴근이 가능합니다.</td></tr>
+        <tr><td><strong>WEB IP</strong></td><td>등록된 IP 대역 환경에서만 출퇴근이 가능합니다.</td></tr>
+        <tr><td><strong>WIFI</strong></td><td>등록된 WIFI 환경에서만 출퇴근이 가능합니다.</td></tr>
+        <tr><td><strong>대표 근무지</strong></td><td>신규 직원 기본 근무지로 자동 배포됩니다.</td></tr>
+        <tr><td><strong>미사용 처리</strong></td><td>기존 직원은 유지하되 신규 배포 대상에서는 제외됩니다.</td></tr>
+      </tbody>
+    </table>
+    <div class="key-box">직원 화면에 보이는 나의 근무지와 출퇴근 인정 방식은 이 화면에서 관리한 값이 반영된 결과입니다.</div>
+
+    <hr class="section-divider">
+    <h2 id="checklist">운영 체크리스트</h2>
+    <div class="grid-2">
+      <div class="trigger-box"><h3>근무지명이 명확한가</h3><p>현장, 지점, 사무실을 직원이 쉽게 구분할 수 있는 이름인지 확인합니다.</p></div>
+      <div class="trigger-box t-purple"><h3>체크 방식이 실제 환경과 맞는가</h3><p>GPS, WEB IP, WIFI 중 현장 운영에 맞는 방식을 선택했는지 점검합니다.</p></div>
+      <div class="trigger-box t-teal"><h3>반경과 네트워크 값이 적절한가</h3><p>너무 넓거나 너무 좁은 기준으로 인해 출퇴근 실패가 반복되지 않는지 확인합니다.</p></div>
+      <div class="trigger-box t-coral"><h3>대표 근무지 변경 영향이 검토되었는가</h3><p>신규 직원 기본 배포 기준이 바뀌는 점을 감안해 변경 여부를 결정합니다.</p></div>
+    </div>
+
+    <hr class="section-divider">
+    <h2 id="related">함께 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="근무지관리.html" target="_top">근무지 관리 →</a>
+      <a href="직원근태.html" target="_top">직원 근태 →</a>
+      <a href="근태관리_개요.html" target="_top">근태관리 개요 →</a>
+    </div>
+  </div>
+  <button class="fab-toc" id="fabToc" title="목차 열기">≡</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">설정 화면 개요</a>
+    <a href="#flow">등록/수정 흐름</a>
+    <a href="#common-fields">공통 입력 필드</a>
+    <a href="#check-logic">출퇴근 체크 방식 설정 로직</a>
+    <a href="#gps">주소 / 좌표 / 반경 설정</a>
+    <a href="#webip">WEB IP 설정</a>
+    <a href="#wifi">WIFI 설정</a>
+    <a href="#representative">대표 근무지 설정 규칙</a>
+    <a href="#save-policy">저장 / 취소 / 검증 / 필수값 얼럿</a>
+    <a href="#impact">직원 출퇴근 적용 영향</a>
+    <a href="#checklist">운영 체크리스트</a>
+    <a href="#related">함께 보면 좋은 문서</a>
+  </div>
+  <script>
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

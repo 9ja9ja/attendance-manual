@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근무 패턴 관리 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --blue: #58a6ff;
+      --blue-bg: #0d1f3c;
+      --green: #3fb950;
+      --green-bg: #0d2818;
+      --orange: #d29922;
+      --orange-bg: #2a1e00;
+      --red: #f85149;
+      --red-bg: #3b1116;
+      --purple: #bc8cff;
+      --purple-bg: #1e0e3e;
+      --teal: #39d9c1;
+      --teal-bg: #0a2e2a;
+      --pink: #f778ba;
+      --pink-bg: #3a1228;
+      --coral: #ea8a5e;
+      --coral-bg: #2c1a0e;
+      --cyan: #56d4dd;
+      --cyan-bg: #0a2a2e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .standalone-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .standalone-nav .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;
+      color: var(--blue); background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2); text-decoration: none;
+      cursor: pointer; transition: all 0.15s; font-family: inherit;
+    }
+    .standalone-nav .back-btn:hover { background: rgba(88,166,255,0.15); }
+    .standalone-nav .page-title { font-size: 0.85rem; font-weight: 600; color: var(--text2); }
+    .standalone-nav .page-badge {
+      font-size: 0.62rem; font-weight: 600; padding: 2px 7px; border-radius: 6px;
+      background: rgba(63,185,80,0.12); color: var(--green);
+    }
+    @media all { body.in-iframe .standalone-nav { display: none; } }
+
+    .mfg-content { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+    .mfg-content h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .mfg-content .subtitle { color: var(--text2); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.7; }
+    .mfg-content h2 { font-size: 1.4rem; font-weight: 700; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+    .mfg-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    .mfg-content h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--text2); }
+    .mfg-content p { margin-bottom: 0.75rem; color: var(--text); font-size: 0.92rem; line-height: 1.7; }
+    .mfg-content ul, .mfg-content ol { margin: 0.5rem 0 1rem; padding-left: 1.25rem; color: var(--text); }
+    .mfg-content li { font-size: 0.92rem; line-height: 1.7; margin-bottom: 0.4rem; }
+    .section-divider { border: none; height: 2px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 3rem 0; }
+
+    .toc { margin: 1.5rem 0 2.5rem; padding: 1.25rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; }
+    .toc-title { font-size: 0.85rem; font-weight: 700; color: var(--text2); margin-bottom: 0.75rem; }
+    .toc a { color: var(--blue); text-decoration: none; font-size: 0.88rem; display: block; padding: 3px 0; }
+    .toc a:hover { text-decoration: underline; }
+
+    .fab-toc {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--blue); border: 2px solid rgba(88,166,255,0.4);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab-toc:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background: var(--bg3); border-color: var(--border); }
+    .float-toc {
+      position: fixed; bottom: 5.5rem; right: 2rem; z-index: 998;
+      width: 340px; max-height: 70vh; overflow-y: auto;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5); display: none;
+    }
+    .float-toc.show { display: block; animation: tocSlideIn 0.2s ease; }
+    @keyframes tocSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .float-toc .toc-title { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 0.6rem; }
+    .float-toc a { color: var(--blue); text-decoration: none; font-size: 0.82rem; display: block; padding: 4px 0; }
+    .float-toc a:hover { text-decoration: underline; color: #fff; }
+    body.in-iframe .fab-toc { bottom: 1.5rem; right: 1.5rem; }
+    body.in-iframe .float-toc { bottom: 4.5rem; right: 1.5rem; }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+    .tag {
+      padding: 5px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 500;
+      background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.2); color: var(--blue);
+    }
+
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.5rem 0; }
+    .nav-links a {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;
+      color: var(--blue); background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2); text-decoration: none; transition: all 0.15s;
+    }
+    .nav-links a:hover { background: rgba(88,166,255,0.15); }
+
+    .note-box { background: rgba(210,153,34,0.08); border: 1px solid rgba(210,153,34,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--orange); margin: 0.75rem 0; line-height: 1.7; }
+    .important-box { background: rgba(248,81,73,0.08); border: 1px solid rgba(248,81,73,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--red); margin: 0.75rem 0; line-height: 1.7; }
+    .key-box { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--green); margin: 0.75rem 0; line-height: 1.7; }
+    .diff-box { background: rgba(188,140,255,0.08); border: 1px solid rgba(188,140,255,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--purple); margin: 0.75rem 0; line-height: 1.7; }
+    .formula-box { background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--blue); margin: 0.75rem 0; line-height: 1.7; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .trigger-box { background: var(--bg2); border: 1px solid var(--border); border-left: 4px solid var(--blue); border-radius: 8px; padding: 1rem 1.25rem; }
+    .trigger-box h3 { font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem; color: var(--text); }
+    .trigger-box p { font-size: 0.85rem; color: var(--text2); margin: 0; line-height: 1.7; }
+    .trigger-box.t-green { border-left-color: var(--green); }
+    .trigger-box.t-orange { border-left-color: var(--orange); }
+    .trigger-box.t-purple { border-left-color: var(--purple); }
+    .trigger-box.t-teal { border-left-color: var(--teal); }
+    .trigger-box.t-red { border-left-color: var(--red); }
+    .trigger-box.t-pink { border-left-color: var(--pink); }
+    .trigger-box.t-coral { border-left-color: var(--coral); }
+    .trigger-box.t-cyan { border-left-color: var(--cyan); }
+
+    .flow-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin: 1rem 0; }
+    .flow-step { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; }
+    .flow-step strong { display: block; font-size: 0.85rem; font-weight: 700; color: var(--blue); margin-bottom: 0.5rem; }
+    .flow-step p { font-size: 0.8rem; color: var(--text2); margin: 0; line-height: 1.6; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1rem 0; }
+    th { text-align: left; font-weight: 600; font-size: 0.78rem; color: var(--text3); padding: 8px 10px; border-bottom: 2px solid var(--border); text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 10px 10px; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--text); line-height: 1.7; }
+
+    .field-spec td:first-child { white-space: nowrap; font-weight: 600; color: var(--blue); width: 160px; }
+    .field-spec td:nth-child(2) { color: var(--text2); font-size: 0.82rem; }
+
+    .alert-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; margin: 0.5rem 0; font-size: 0.85rem; line-height: 1.7; }
+    .alert-box .alert-id { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-right: 8px; background: rgba(248,81,73,0.12); color: var(--red); }
+    .alert-box .alert-id.confirm { background: rgba(210,153,34,0.12); color: var(--orange); }
+    .alert-box .alert-id.info { background: rgba(63,185,80,0.12); color: var(--green); }
+    .alert-box .alert-msg { color: var(--text2); font-style: italic; }
+
+    @media (max-width: 768px) {
+      .mfg-content { padding: 1.5rem 1rem 3rem; }
+      .mfg-content h1 { font-size: 1.4rem; }
+      .grid-2, .grid-3, .flow-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">← 인덱스</a>
+    <span class="page-title">근무 패턴 관리</span>
+    <span class="page-badge">HR-01-110-P3</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>근무 패턴 관리</h1>
+    <p class="subtitle">근로제의 기본 규칙을 유지하면서 특정 주기마다 발생하는 예외 근무 사항을 등록·수정·삭제하는 팝업 화면입니다. 월 1회 단축 근무, 토요일 특근, 격주 휴무 등 반복적인 근무 변형을 패턴으로 등록하여 자동 반영합니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">화면 ID: HR-01-110-P3</span>
+      <span class="tag">진입: 근로제 등록 &gt; 근무 패턴 추가</span>
+      <span class="tag">화면 유형: 팝업</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">개요와 진입 동선</a>
+      <a href="#fields">등록 필드 상세</a>
+      <a href="#repeat">반복 설정 상세</a>
+      <a href="#repeat-end">반복 종료 설정</a>
+      <a href="#work-type">근무 유형·정상 근로 인정·계산 기준</a>
+      <a href="#view">조회(상세) 화면</a>
+      <a href="#edit">수정 화면</a>
+      <a href="#actions">저장·삭제·취소</a>
+      <a href="#example">활용 예시</a>
+      <a href="#related">연결 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 개요 -->
+    <h2 id="overview">개요와 진입 동선</h2>
+    <p>근무 패턴은 근로제 등록·수정 화면의 <strong>근무 패턴 추가</strong> 버튼을 통해 진입합니다. 등록된 근무 패턴은 근로제 정보 탭의 근무 패턴 필드에 목록으로 표시됩니다.</p>
+
+    <div class="flow-row">
+      <div class="flow-step">
+        <strong>1. 패턴 추가 버튼</strong>
+        <p>근로제 등록 화면에서 "근무 패턴 추가" 선택</p>
+      </div>
+      <div class="flow-step">
+        <strong>2. 패턴 등록 팝업</strong>
+        <p>패턴명, 반복 주기, 근무 시간, 유형 설정</p>
+      </div>
+      <div class="flow-step">
+        <strong>3. 저장</strong>
+        <p>패턴 목록에 등록, 근로제에 연결</p>
+      </div>
+      <div class="flow-step">
+        <strong>4. 반복 적용</strong>
+        <p>기준일부터 자동 반복 반영</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 등록 필드 상세 -->
+    <h2 id="fields">등록 필드 상세</h2>
+    <table class="field-spec">
+      <thead>
+        <tr><th>필드명</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>근무 패턴명 *</td>
+          <td>
+            신규 생성하는 근무 패턴의 명칭을 입력합니다.<br>
+            모든 텍스트 입력 가능 (한글, 영문, 숫자, 공란, 특수문자), <strong>50자 이내</strong>.<br>
+            예: "가족의 날 단축 근무", "토요일 특근", "매월 마지막 수요일 단축"
+          </td>
+        </tr>
+        <tr>
+          <td>기준일 *</td>
+          <td>
+            등록하는 근무 패턴이 적용되는 기준 일자입니다.<br>
+            default: 시스템 년/월/일 + 1일. 키인 또는 달력 아이콘으로 변경 가능.<br>
+            <strong>시스템 일자 포함 이전 일자는 입력/선택 불가능</strong>합니다.<br>
+            저장된 일자부터 패턴이 적용됩니다.
+          </td>
+        </tr>
+        <tr>
+          <td>근무 시간 *</td>
+          <td>
+            패턴 적용일의 근무 시간을 입력합니다.<br>
+            시작: 09:00(default), 종료: 18:00(default). 키인 가능.<br>
+            입력된 근무 시간 - 휴게 시간이 우측에 자동 표시됩니다.<br>
+            <strong>근무 인정 시간</strong>이 별도로 표시됩니다.
+          </td>
+        </tr>
+        <tr>
+          <td>휴게 시간 *</td>
+          <td>
+            패턴 적용일의 휴게 시간을 입력합니다.<br>
+            시작: 12:00(default), 종료: 13:00(default). 키인 가능.<br>
+            법정 기준: 4시간 근로 시 30분 이상, 8시간 근로 시 1시간 이상 필수 부여.<br>
+            기준 미달 시 저장 시점에 경고 얼럿이 노출됩니다.<br>
+            <strong>휴게 인정 시간</strong>이 별도로 표시됩니다.
+          </td>
+        </tr>
+        <tr>
+          <td>비고</td>
+          <td>
+            근무 패턴에 대한 설명을 작성할 수 있는 선택 필드입니다.<br>
+            모든 텍스트 입력 가능, <strong>100자 한도</strong>.<br>
+            예: "직원 복지를 위한 매월 1시간 단축 근무"
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- 반복 설정 -->
+    <h2 id="repeat">반복 설정 상세</h2>
+    <p>근무 패턴이 적용되는 반복 주기를 설정합니다. 반복 일정에 맞춰 근로제에 자동 반영됩니다.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>반복 유형</th>
+          <th>설명</th>
+          <th>하위 옵션</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>없음</strong></td>
+          <td>기준일 1회만 적용됩니다.</td>
+          <td>추가 옵션 없음</td>
+        </tr>
+        <tr>
+          <td><strong>일</strong></td>
+          <td>반복 주기에 따라 일별로 패턴이 적용됩니다.</td>
+          <td>
+            · 숫자 입력 필드: '1'(default), 2자리까지 입력 → "N일 마다 반복"<br>
+            · <strong>말일 체크박스</strong>: 선택 시 매월 말일에 반복 적용, 입력 영역 비활성화
+          </td>
+        </tr>
+        <tr>
+          <td><strong>주</strong></td>
+          <td>반복 주기에 따라 주차별로 선택한 요일에 적용됩니다.</td>
+          <td>
+            · 숫자 입력 필드: '1'(default), 2자리까지 → "N주 마다 반복"<br>
+            · <strong>요일 선택 버튼</strong>: 월~일 중 반복할 요일을 활성화하여 지정
+          </td>
+        </tr>
+        <tr>
+          <td><strong>월</strong> (default)</td>
+          <td>반복 주기에 따라 월별로 선택한 일자/주차 요일에 적용됩니다.</td>
+          <td>
+            · 숫자 입력 필드: '1'(default), 2자리까지 → "N개월 마다 반복"<br>
+            · 드롭다운: <strong>매월 N일</strong> / <strong>N번째 X요일</strong> / <strong>마지막 X요일</strong><br>
+            예: "매월 24일", "네번째 목요일", "마지막 목요일"
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- 반복 종료 -->
+    <h2 id="repeat-end">반복 종료 설정</h2>
+    <p>설정한 반복 주기를 종료하는 시점을 지정합니다. 반복이 종료된 이후부터는 근무 패턴이 반영되지 않으며, 반복 종료 시점을 다시 설정하여 패턴을 재적용할 수 있습니다.</p>
+    <table>
+      <thead>
+        <tr><th>종료 유형</th><th>설명</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>없음</strong> (default)</td>
+          <td>근무 패턴 종료 일자를 지정하지 않고 <strong>계속 반복</strong>합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>날짜</strong></td>
+          <td>
+            지정한 날짜에 패턴이 종료됩니다.<br>
+            default: 시스템 년 +1, 월, 일. 키인 가능, 달력 아이콘으로 선택 가능.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>회차</strong></td>
+          <td>
+            반복 횟수를 지정하고 해당 횟수까지 반복 후 패턴이 종료됩니다.<br>
+            입력 필드: '1'(default), 2자리 숫자 입력 → "N회 반복"
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- 근무 유형·정상 근로 인정·계산 기준 -->
+    <h2 id="work-type">근무 유형·정상 근로 인정·계산 기준</h2>
+    <p>근무 패턴의 성격과 근태 집계 방식을 결정하는 3가지 핵심 설정입니다.</p>
+
+    <h3>근무 유형</h3>
+    <p>근무 패턴의 집계 유형을 선택합니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>근무 (default)</h3>
+        <p>등록 패턴을 <strong>근무(출근) 처리</strong>합니다. 근무 진행에 따른 근로 시간이 설정됩니다. 근무 집계 시 근무(출근)으로 저장됩니다.</p>
+      </div>
+      <div class="trigger-box t-coral">
+        <h3>휴무</h3>
+        <p>등록 패턴을 <strong>휴일 처리</strong>합니다. 근무 집계 시에도 휴일로 저장됩니다.</p>
+      </div>
+    </div>
+
+    <h3>정상 근로 인정</h3>
+    <p>소정 근로에 포함 여부를 선택합니다. 근무 패턴의 근무 유형에 따른 근로 시간 인정 방식을 선택할 수 있습니다.</p>
+    <div class="grid-3">
+      <div class="trigger-box t-teal">
+        <h3>인정 (default)</h3>
+        <p>기본 근로로 인정하여 <strong>소정 근로 시간(주 40시간)</strong>에 포함됩니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>휴일 근무</h3>
+        <p>기본 근로가 아닌 <strong>휴일 근무</strong>로 인정됩니다. 주 12시간 한도에 포함됩니다.</p>
+      </div>
+      <div class="trigger-box t-red">
+        <h3>미인정</h3>
+        <p>근로 시간으로 <strong>인정하지 않습니다</strong>. 급여 계산 대상에서 제외됩니다.</p>
+      </div>
+    </div>
+
+    <h3>근무 시간 계산 기준</h3>
+    <p>근태 기록에 적용되는 근무 시간 기준을 선택합니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-purple">
+        <h3>근로제 표준 시간 (default)</h3>
+        <p>출/퇴근의 경우 근무 패턴 등록 근무 시간을 적용하지만, <strong>근태 기록은 근로제 정보에서 지정한 근로 시간</strong>을 적용합니다.</p>
+      </div>
+      <div class="trigger-box t-cyan">
+        <h3>패턴 등록 시간</h3>
+        <p>출/퇴근 뿐 아니라 <strong>근태 기록도 패턴에서 등록한 근로 시간</strong>을 적용합니다.</p>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>차이 예시:</strong> "가족의 날 단축 근무" 패턴에서 09:00~17:00으로 등록한 경우<br>
+      · <strong>근로제 표준 시간</strong>: 출퇴근은 09:00~17:00이지만 근태 기록은 근로제의 09:00~18:00 기준 적용<br>
+      · <strong>패턴 등록 시간</strong>: 출퇴근과 근태 기록 모두 09:00~17:00 기준 적용
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 조회(상세) 화면 -->
+    <h2 id="view">조회(상세) 화면</h2>
+    <p>저장된 근무 패턴에 대해 상세 정보를 조회할 수 있는 팝업입니다. 근무 패턴 목록에서 패턴을 선택하면 이 팝업이 열립니다.</p>
+    <ul>
+      <li>저장된 모든 정보가 <strong>disable 처리</strong>되어 조회 전용으로 노출됩니다.</li>
+      <li>하단에 <strong>삭제</strong>, <strong>취소</strong>, <strong>수정</strong> 버튼이 제공됩니다.</li>
+      <li>수정 버튼은 근로제 등록/수정 화면에서 진입한 경우에만 노출됩니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <!-- 수정 화면 -->
+    <h2 id="edit">수정 화면</h2>
+    <p>상세 화면에서 <strong>수정 버튼</strong>을 선택하면 저장된 근무 패턴을 불러온 등록/수정 팝업으로 이동합니다. 등록 화면과 동일한 폼에 기존 값이 로드됩니다.</p>
+    <div class="key-box">
+      수정 버튼은 <strong>근로제 등록/수정 화면에서 근무 패턴 관리 팝업에 진입한 경우에만 노출</strong>됩니다. 다른 경로에서 진입 시에는 조회 전용입니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 저장·삭제·취소 -->
+    <h2 id="actions">저장·삭제·취소</h2>
+
+    <h3>저장</h3>
+    <p>입력 사항을 저장하고 근무 패턴 목록에 반영합니다.</p>
+    <div class="alert-box">
+      <span class="alert-id info">A004</span>
+      <span class="alert-msg">"저장되었습니다." — 필수 정보(근무 패턴명 등)가 모두 입력된 경우</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id">A010</span>
+      <span class="alert-msg">"%필수 값%이 입력되지 않았습니다. 내용을 입력하고 다시 시도해주세요." — 필수값 미입력 시</span>
+    </div>
+
+    <h3>삭제</h3>
+    <p>조회된 근무 패턴을 삭제합니다. 삭제 시 컨펌 팝업을 거칩니다.</p>
+    <div class="alert-box">
+      <span class="alert-id confirm">C004</span>
+      <span class="alert-msg">"저장된 근무 패턴을 삭제하시겠습니까? 삭제된 근무 패턴은 복구할 수 없으며 사용 중인 경우 적용이 종료 처리됩니다."</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id info">A011</span>
+      <span class="alert-msg">"삭제되었습니다." — 삭제 확인 후 성공 안내</span>
+    </div>
+
+    <h3>취소</h3>
+    <p>변경사항을 취소하고 팝업을 닫습니다.</p>
+    <ul>
+      <li><strong>입력/수정된 정보가 있는 경우</strong>: 근무 패턴명 등 입력되거나 default 값에서 변경된 항목이 하나라도 있으면 컨펌 팝업이 노출됩니다.</li>
+      <li><strong>입력/수정된 정보가 없는 경우</strong>: default 값으로만 구성되어 있으면 별도 동작 없이 팝업이 종료됩니다.</li>
+    </ul>
+    <div class="alert-box">
+      <span class="alert-id confirm">C003</span>
+      <span class="alert-msg">"변경된 내용이 저장되지 않습니다. 작성 중인 화면에서 나가시겠습니까?"</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 활용 예시 -->
+    <h2 id="example">활용 예시</h2>
+    <div class="grid-2">
+      <div class="trigger-box t-teal">
+        <h3>가족의 날 단축 근무</h3>
+        <p>
+          · 반복: 매월 / 1개월 마다 / 마지막 수요일<br>
+          · 근무 시간: 09:00 ~ 17:00 (8시간 → 인정 7시간)<br>
+          · 근무 유형: 근무<br>
+          · 정상 근로 인정: 인정<br>
+          · 계산 기준: 패턴 등록 시간<br>
+          · 비고: "직원 복지를 위한 매월 1시간 단축 근무"
+        </p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>토요일 특근</h3>
+        <p>
+          · 반복: 매월 / 1개월 마다 / 첫번째 토요일<br>
+          · 근무 시간: 09:00 ~ 13:00 (4시간)<br>
+          · 근무 유형: 근무<br>
+          · 정상 근로 인정: 휴일 근무<br>
+          · 계산 기준: 패턴 등록 시간<br>
+          · 비고: "월초 재고 실사를 위한 특근"
+        </p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>격주 금요일 휴무</h3>
+        <p>
+          · 반복: 매주 / 2주 마다 / 금요일<br>
+          · 근무 유형: 휴무<br>
+          · 정상 근로 인정: 미인정<br>
+          · 비고: "격주 금요일 유연 휴무"
+        </p>
+      </div>
+      <div class="trigger-box t-pink">
+        <h3>한시적 야간 연장</h3>
+        <p>
+          · 반복: 매일 / 1일 마다<br>
+          · 반복 종료: 날짜 (2026-06-30)<br>
+          · 근무 시간: 09:00 ~ 21:00<br>
+          · 근무 유형: 근무<br>
+          · 정상 근로 인정: 인정<br>
+          · 계산 기준: 패턴 등록 시간
+        </p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 연결 문서 -->
+    <h2 id="related">연결 문서</h2>
+    <div class="nav-links">
+      <a href="근로제등록.html" target="_top">← 근로제 등록·수정</a>
+      <a href="근로제관리.html" target="_top">← 근로제 관리 (목록)</a>
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간·월마감 →</a>
+      <a href="근태관리_개요.html" target="_top">근태관리 개요 →</a>
+    </div>
+  </div>
+
+  <!-- Floating TOC -->
+  <button class="fab-toc" id="fabToc" title="목차 열기">☰</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">개요와 진입 동선</a>
+    <a href="#fields">등록 필드 상세</a>
+    <a href="#repeat">반복 설정 상세</a>
+    <a href="#repeat-end">반복 종료 설정</a>
+    <a href="#work-type">근무 유형·인정·계산 기준</a>
+    <a href="#view">조회(상세) 화면</a>
+    <a href="#edit">수정 화면</a>
+    <a href="#actions">저장·삭제·취소</a>
+    <a href="#example">활용 예시</a>
+    <a href="#related">연결 문서</a>
+  </div>
+
+  <script>
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근태 요청 관리 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2129;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--blue:#58a6ff;--green:#3fb950;--orange:#d29922;--red:#f85149;--purple:#bc8cff;--teal:#39d9c1;--pink:#f778ba;--coral:#ea8a5e;--cyan:#56d4dd}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+    .standalone-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    .standalone-nav .back-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;cursor:pointer;transition:all .15s;font-family:inherit}
+    .standalone-nav .back-btn:hover{background:rgba(88,166,255,.15)}
+    .standalone-nav .page-title{font-size:.85rem;font-weight:600;color:var(--text2)}
+    .standalone-nav .page-badge{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(63,185,80,.12);color:var(--green)}
+    @media all{body.in-iframe .standalone-nav{display:none}}
+    .mfg-content{max-width:960px;margin:0 auto;padding:2.5rem 2rem 4rem}
+    .mfg-content h1{font-size:1.8rem;font-weight:700;margin-bottom:.5rem}
+    .mfg-content .subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+    .mfg-content h2{font-size:1.4rem;font-weight:700;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .mfg-content h3{font-size:1.15rem;font-weight:600;margin:1.5rem 0 .75rem}
+    .mfg-content p{margin-bottom:.75rem;color:var(--text);font-size:.92rem;line-height:1.7}
+    .mfg-content ul{margin:.5rem 0 1rem;padding-left:1.25rem;color:var(--text)}
+    .mfg-content li{font-size:.92rem;line-height:1.7;margin-bottom:.4rem}
+    .section-divider{border:none;height:2px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:3rem 0}
+    .toc{margin:1.5rem 0 2.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+    .toc-title{font-size:.85rem;font-weight:700;color:var(--text2);margin-bottom:.75rem}
+    .toc a{color:var(--blue);text-decoration:none;font-size:.88rem;display:block;padding:3px 0}
+    .toc a:hover{text-decoration:underline}
+    .fab-toc{position:fixed;bottom:2rem;right:2rem;z-index:999;width:48px;height:48px;border-radius:50%;background:var(--blue);border:2px solid rgba(88,166,255,.4);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+    .fab-toc:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(88,166,255,.4)}
+    .fab-toc.active{background:var(--bg3);border-color:var(--border)}
+    .float-toc{position:fixed;bottom:5.5rem;right:2rem;z-index:998;width:340px;max-height:70vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
+    .float-toc.show{display:block;animation:tocSlideIn .2s ease}
+    @keyframes tocSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .float-toc .toc-title{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:.6rem}
+    .float-toc a{color:var(--blue);text-decoration:none;font-size:.82rem;display:block;padding:4px 0}
+    .float-toc a:hover{text-decoration:underline;color:#fff}
+    body.in-iframe .fab-toc{bottom:1.5rem;right:1.5rem}
+    body.in-iframe .float-toc{bottom:4.5rem;right:1.5rem}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+    .tag{padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);color:var(--blue)}
+    .nav-links{display:flex;gap:8px;flex-wrap:wrap;margin:1.5rem 0}
+    .nav-links a{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;transition:all .15s}
+    .nav-links a:hover{background:rgba(88,166,255,.15)}
+    .note-box{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--orange);margin:.75rem 0;line-height:1.7}
+    .important-box{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--red);margin:.75rem 0;line-height:1.7}
+    .key-box{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--green);margin:.75rem 0;line-height:1.7}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+    .trigger-box{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:1rem 1.25rem}
+    .trigger-box h3{font-size:1rem;font-weight:600;margin:0 0 .5rem;color:var(--text)}
+    .trigger-box p{font-size:.85rem;color:var(--text2);margin:0;line-height:1.7}
+    .trigger-box.t-green{border-left-color:var(--green)}.trigger-box.t-orange{border-left-color:var(--orange)}.trigger-box.t-purple{border-left-color:var(--purple)}.trigger-box.t-teal{border-left-color:var(--teal)}.trigger-box.t-red{border-left-color:var(--red)}.trigger-box.t-pink{border-left-color:var(--pink)}.trigger-box.t-coral{border-left-color:var(--coral)}.trigger-box.t-cyan{border-left-color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+    th{text-align:left;font-weight:600;font-size:.78rem;color:var(--text3);padding:8px 10px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    td{padding:10px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--text);line-height:1.7}
+    td strong{white-space:nowrap}
+    .field-spec td:first-child{white-space:nowrap;font-weight:600;color:var(--blue);width:180px}
+    .field-spec td:nth-child(2){color:var(--text2);font-size:.82rem}
+    .alert-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin:.5rem 0;font-size:.85rem;line-height:1.7}
+    .alert-box .alert-id{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;margin-right:8px;background:rgba(248,81,73,.12);color:var(--red)}
+    .alert-box .alert-id.confirm{background:rgba(210,153,34,.12);color:var(--orange)}
+    .alert-box .alert-id.info{background:rgba(88,166,255,.12);color:var(--blue)}
+    .alert-box .alert-msg{color:var(--text2);font-style:italic}
+    @media(max-width:768px){.mfg-content{padding:1.5rem 1rem 3rem}.mfg-content h1{font-size:1.4rem}.grid-2,.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">&larr; 인덱스</a>
+    <span class="page-title">근태 요청 관리</span>
+    <span class="page-badge">Operation</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>근태 요청 관리</h1>
+    <p class="subtitle">직원이 요청한 근로제 수정, 출퇴근 시간 수정, 근태 수정 내역을 관리자가 조회하고, 승인 또는 거절하는 화면입니다. 개별 처리와 일괄 확정이 모두 가능하며, 처리 후에는 복구할 수 없습니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">경로: 근태관리 &gt; 근태 요청 관리</span>
+      <span class="tag">권한: 관리자</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">화면 개요</a>
+      <a href="#search">검색 영역</a>
+      <a href="#list">조회 영역</a>
+      <a href="#batch-btn">일괄 확정 버튼</a>
+      <a href="#batch-popup">요청 일괄 확정 팝업</a>
+      <a href="#approve-popup">개별 승인 팝업</a>
+      <a href="#reject-popup">개별 거절 팝업</a>
+      <a href="#alerts">얼럿/컨펌 메시지 정리</a>
+      <a href="#approve-effect">승인 후 영향</a>
+      <a href="#closing-impact">마감 영향</a>
+      <a href="#related">연결 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 1. 화면 개요 -->
+    <h2 id="overview">화면 개요</h2>
+    <p>근태 요청 관리는 <strong>관리자 전용 화면</strong>입니다. 직원이 등록한 근로제 수정, 출퇴근 시간 수정, 근태 수정 요청이 이 화면에 집계되며, 관리자가 건별 또는 일괄로 승인/거절 처리를 수행합니다.</p>
+    <ul>
+      <li>요청 목록은 <strong>신청일자 최신순(오름차순)</strong>으로 조회됩니다.</li>
+      <li>동일 직원, 동일 신청일자의 요청이 여러 건 존재하면 <strong>마지막 요청 건만 노출</strong>됩니다.</li>
+      <li>처리(승인/거절) 완료된 건은 상태가 변경되며, <strong>처리 후에는 복구할 수 없습니다.</strong></li>
+    </ul>
+    <div class="important-box">이 화면은 단순 조회가 아닌 확정 처리 화면입니다. 승인/거절 저장 후에는 되돌릴 수 없으므로, 처리 전 요청 내역과 적용 요청 일자를 반드시 확인하십시오.</div>
+
+    <hr class="section-divider">
+
+    <!-- 2. 검색 영역 -->
+    <h2 id="search">검색 영역</h2>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>검색 드롭다운</td>
+          <td>전체(default) / 이름 / 사원번호 / 부서 / 직급 중 선택합니다. 선택한 기준에 따라 검색어 범위가 결정됩니다.</td>
+        </tr>
+        <tr>
+          <td>검색어 입력</td>
+          <td>공란(default). 모든 텍스트 입력 가능하며, 최대 <strong>50자</strong>까지 입력할 수 있습니다. LIKE %검색어% 방식으로 부분 일치 검색합니다.</td>
+        </tr>
+        <tr>
+          <td>검색 실행</td>
+          <td><strong>Enter 키</strong> 또는 <strong>조회 버튼</strong> 클릭으로 검색을 실행합니다.</td>
+        </tr>
+        <tr>
+          <td>결과 없음</td>
+          <td>조회 결과가 없으면 목록 영역에 <strong>"조회된 데이터가 없습니다"</strong> 문구가 노출됩니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- 3. 조회 영역 -->
+    <h2 id="list">조회 영역</h2>
+    <p>검색 결과는 아래 컬럼으로 구성된 테이블 형태로 노출됩니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>컬럼</th>
+          <th>설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>체크박스</strong></td>
+          <td>개별 요청 건을 선택합니다. 1개 이상 선택 시 일괄 확정 버튼이 활성화됩니다.</td>
+        </tr>
+        <tr>
+          <td><strong>부서</strong></td>
+          <td>요청 직원의 부서/팀명을 표시합니다. 1단계 상위 조직까지 함께 노출됩니다.</td>
+        </tr>
+        <tr>
+          <td><strong>이름(사번)</strong></td>
+          <td>직원 이름과 사원번호를 함께 표시합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>요청 종류</strong></td>
+          <td>
+            4가지 유형으로 구분되며, 유형에 따라 상세 문구 형식이 다릅니다.
+            <ul>
+              <li><strong>근로제 수정</strong>: "['요청월' 근로제 수정 신청] 기존 '%근로제명%'(근로제종류)에서 '%근로제명%'(근로제종류)으로 변경 요청"</li>
+              <li><strong>출근 시간 수정</strong>: "[요청일자] 기존 출근 시간 %시간%에서 %시간%으로 변경 요청(&#177;차이)"</li>
+              <li><strong>퇴근 시간 수정</strong>: "[요청일자] 기존 퇴근 시간 %시간%에서 %시간%으로 변경 요청(&#177;차이)"</li>
+              <li><strong>근태 수정</strong>: 출퇴근 시간 모두에 대한 수정 요청</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>요청 사유</strong></td>
+          <td>직원이 입력한 변경 사유입니다. 관리자가 승인/거절 판단 시 참고합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>신청 일자</strong></td>
+          <td>요청이 등록된 일시입니다. 목록은 이 값 기준으로 최신순 정렬됩니다.</td>
+        </tr>
+        <tr>
+          <td><strong>적용 요청 일자</strong></td>
+          <td>직원이 변경 적용을 희망하는 일자입니다. 승인 시 이 일자부터 변경 사항이 반영됩니다.</td>
+        </tr>
+        <tr>
+          <td><strong>상태</strong></td>
+          <td><strong>대기</strong> / <strong>승인</strong> / <strong>거절</strong> 중 하나로 표시됩니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note-box">동일 직원, 동일 신청일자의 요청이 여러 건 존재하면 마지막 요청 건만 노출됩니다. 이 화면은 "요청 이력 전체"가 아닌 "현재 유효한 요청" 중심으로 운영됩니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 4. 일괄 확정 버튼 -->
+    <h2 id="batch-btn">일괄 확정 버튼</h2>
+    <p>조회 영역의 체크박스에서 <strong>1개 이상의 요청 건을 선택</strong>하면 일괄 확정 버튼이 활성화됩니다. 선택하지 않은 상태에서는 비활성(disabled) 상태입니다.</p>
+    <div class="trigger-box t-green">
+      <h3>일괄 확정</h3>
+      <p>버튼 클릭 시 <strong>요청 일괄 확정 팝업</strong>이 노출됩니다. 선택한 건을 한 번에 승인 또는 거절 처리할 수 있습니다.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 5. 요청 일괄 확정 팝업 -->
+    <h2 id="batch-popup">요청 일괄 확정 팝업</h2>
+    <p>일괄 확정 버튼 클릭 시 노출되는 팝업입니다. 선택한 요청 건을 모두 승인 또는 거절할 수 있으며, 관리자 사유를 입력하여 저장합니다.</p>
+    <div class="key-box">상단 안내: "근태 요청 관리에서 선택한 요청 사항을 모두 승인/거절할 수 있습니다. 저장 후 처리한 내용에 대해서는 복구할 수 없습니다."</div>
+
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>선택 요청 건수</td>
+          <td><strong>"N건"</strong> 형태로 현재 선택된 요청 건수를 표시합니다.</td>
+        </tr>
+        <tr>
+          <td>확정 처리 구분</td>
+          <td>라디오 버튼으로 <strong>승인(default)</strong> 또는 <strong>거절</strong>을 선택합니다. 하나의 팝업에서 일괄 승인과 일괄 거절을 모두 처리하는 구조입니다.</td>
+        </tr>
+        <tr>
+          <td>사유</td>
+          <td>인풋 필드. 모든 텍스트 입력 가능하며, 최대 <strong>50자</strong>까지 입력할 수 있습니다. 입력한 사유는 직원 조회 화면에서 확인할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>취소 버튼</td>
+          <td>별도 동작 없이 팝업이 닫힙니다.</td>
+        </tr>
+        <tr>
+          <td>저장 버튼</td>
+          <td>사유 미입력 시 얼럿(A005) 노출. 정상 입력 시 컨펌(C001 또는 C002) 후 저장을 실행합니다. 저장 완료 시 토스트(A004) 노출.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>저장 시 얼럿 분기</h3>
+    <ul>
+      <li><strong>사유 미입력</strong>: A005 얼럿 노출 후 저장 중단</li>
+      <li><strong>선택 건 전체가 적용 요청 일자 이내</strong>: C001 컨펌 노출 후 저장</li>
+      <li><strong>선택 건 중 적용 요청 일자 초과 건 포함 (승인 시)</strong>: C002 컨펌 노출 -- 적용 요청일이 지나지 않은 건만 승인 가능함을 안내</li>
+      <li><strong>저장 완료</strong>: A004 토스트 노출</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <!-- 6. 개별 승인 팝업 -->
+    <h2 id="approve-popup">개별 승인 팝업</h2>
+    <p>조회 목록에서 개별 요청 건의 승인 버튼을 클릭하면 노출되는 팝업입니다.</p>
+    <div class="key-box">"근태 요청 관리에서 선택한 요청 사항을 승인합니다. 저장 후 처리한 내용에 대해서는 복구할 수 없습니다."</div>
+
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>요청 직원 정보</td>
+          <td>해당 직원의 부서, 이름(사번), 요청 종류, 요청 내역을 표시합니다.</td>
+        </tr>
+        <tr>
+          <td>사유</td>
+          <td>인풋 필드. 최대 <strong>50자</strong>. 관리자가 승인 사유를 입력합니다. 직원 조회 화면에서 확인 가능합니다.</td>
+        </tr>
+        <tr>
+          <td>저장</td>
+          <td>사유 미입력 시 A005 얼럿. 정상 입력 시 승인 컨펌 후 저장, 완료 시 A004 토스트 노출.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- 7. 개별 거절 팝업 -->
+    <h2 id="reject-popup">개별 거절 팝업</h2>
+    <p>조회 목록에서 개별 요청 건의 거절 버튼을 클릭하면 노출되는 팝업입니다.</p>
+    <div class="trigger-box t-red">
+      <h3>거절 팝업 안내</h3>
+      <p>"근태 요청 관리에서 선택한 요청 사항을 거절합니다." 적용 요청 일자가 이미 초과된 건의 경우 자동으로 관련 안내가 표시됩니다.</p>
+    </div>
+
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>요청 직원 정보</td>
+          <td>해당 직원의 부서, 이름(사번), 요청 종류, 요청 내역을 표시합니다.</td>
+        </tr>
+        <tr>
+          <td>사유</td>
+          <td>인풋 필드. 최대 <strong>50자</strong>. 관리자가 거절 사유를 입력합니다. 직원 조회 화면에서 확인 가능합니다.</td>
+        </tr>
+        <tr>
+          <td>저장</td>
+          <td>사유 미입력 시 A005 얼럿. 정상 입력 시 거절 컨펌 후 저장, 완료 시 A004 토스트 노출.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- 8. 얼럿/컨펌 메시지 정리 -->
+    <h2 id="alerts">얼럿/컨펌 메시지 정리</h2>
+
+    <div class="alert-box">
+      <span class="alert-id confirm">C001</span>
+      <span class="alert-msg">"선택한 'N'건에 대하여 '구분값' 처리를 하시겠습니까? 저장 후에는 다시 복구할 수 없습니다."</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id confirm">C002</span>
+      <span class="alert-msg">"적용 요청 일이 지나지 않은 'N'건에 대하여 '승인' 처리가 가능합니다. 저장 후에는 다시 복구할 수 없습니다."</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id info">A004</span>
+      <span class="alert-msg">"저장되었습니다." (토스트)</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id">A005</span>
+      <span class="alert-msg">"처리 사유를 입력해주세요."</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id confirm">승인 컨펌</span>
+      <span class="alert-msg">"해당 요청을 승인 처리를 하시겠습니까? 저장 후 다시 복구할 수 없습니다."</span>
+    </div>
+    <div class="alert-box">
+      <span class="alert-id confirm">거절 컨펌</span>
+      <span class="alert-msg">"해당 요청을 거절 처리를 하시겠습니까? 저장 후 다시 복구할 수 없습니다."</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 9. 승인 후 영향 -->
+    <h2 id="approve-effect">승인 후 영향</h2>
+    <p>승인이 완료되면 요청 종류에 따라 실제 근태 데이터가 변경됩니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-teal">
+        <h3>근로제 수정 승인</h3>
+        <p>적용 요청 일자부터 해당 직원의 근로제가 변경됩니다. 변경된 근로제에 따라 소정근로시간, 예상 출퇴근 시간 등 판정 기준이 갱신됩니다.</p>
+      </div>
+      <div class="trigger-box t-coral">
+        <h3>출퇴근 시간 수정 승인</h3>
+        <p>해당 일자의 출퇴근 데이터가 요청 값으로 업데이트됩니다. 지각/정상 판정, 인정근로시간이 재계산됩니다.</p>
+      </div>
+    </div>
+    <div class="key-box">승인 결과는 직원의 <strong>나의 근태 현황</strong> 화면에서 확인할 수 있습니다. 관리자가 입력한 처리 사유도 직원에게 노출됩니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 10. 마감 영향 -->
+    <h2 id="closing-impact">마감 영향</h2>
+    <p>승인된 요청은 인정근로시간 계산과 월마감 결과에 직접 영향을 미칩니다.</p>
+    <ul>
+      <li><strong>인정근로시간</strong>: 출퇴근 시간 수정 승인 건은 해당 일자의 인정근로시간에 반영되며, 연장/야간 구간 판정에도 영향을 줍니다.</li>
+      <li><strong>근로제 변경</strong>: 근로제 수정 승인 건은 적용 일자 이후의 소정근로시간 프레임 자체를 변경하므로, 일별 판정 기준이 달라집니다.</li>
+      <li><strong>월마감 전 확인</strong>: 미승인(대기) 상태의 요청이 남아 있으면 마감 결과가 달라질 수 있습니다. 마감 전 대기 건을 모두 처리하는 것을 권장합니다.</li>
+    </ul>
+    <div class="note-box">월마감 시점에는 승인 완료 데이터만 반영됩니다. 대기 상태 요청은 마감 결과에 포함되지 않으므로, 마감 전 일괄 확정 기능을 활용하여 미처리 건을 정리하십시오.</div>
+
+    <hr class="section-divider">
+
+    <!-- 11. 연결 문서 -->
+    <h2 id="related">연결 문서</h2>
+    <div class="nav-links">
+      <a href="나의근태현황.html" target="_top">나의 근태 현황 &rarr;</a>
+      <a href="근로제근무지배포.html" target="_top">근로제/근무지 배포 &rarr;</a>
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간/월마감 &rarr;</a>
+      <a href="근태결과집계_마감.html" target="_top">근태결과집계/마감 &rarr;</a>
+    </div>
+  </div>
+
+  <button class="fab-toc" id="fabToc" title="목차 열기">&#9776;</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">화면 개요</a>
+    <a href="#search">검색 영역</a>
+    <a href="#list">조회 영역</a>
+    <a href="#batch-btn">일괄 확정 버튼</a>
+    <a href="#batch-popup">요청 일괄 확정 팝업</a>
+    <a href="#approve-popup">개별 승인 팝업</a>
+    <a href="#reject-popup">개별 거절 팝업</a>
+    <a href="#alerts">얼럿/컨펌 메시지 정리</a>
+    <a href="#approve-effect">승인 후 영향</a>
+    <a href="#closing-impact">마감 영향</a>
+    <a href="#related">연결 문서</a>
+  </div>
+
+  <script>
+    if(window.self!==window.top)document.body.classList.add('in-iframe');
+    const fab=document.getElementById('fabToc'),ftoc=document.getElementById('floatToc');
+    fab.addEventListener('click',()=>{const o=ftoc.classList.toggle('show');fab.classList.toggle('active',o)});
+    document.addEventListener('click',e=>{if(!fab.contains(e.target)&&!ftoc.contains(e.target)){ftoc.classList.remove('show');fab.classList.remove('active')}});
+  </script>
+</body>
+</html>

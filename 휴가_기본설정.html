@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>휴가 기본설정 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2129;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--blue:#58a6ff;--green:#3fb950;--orange:#d29922;--red:#f85149;--purple:#bc8cff;--teal:#39d9c1;--pink:#f778ba;--coral:#ea8a5e;--cyan:#56d4dd}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+    .standalone-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    .standalone-nav .back-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;cursor:pointer;transition:all .15s;font-family:inherit}
+    .standalone-nav .back-btn:hover{background:rgba(88,166,255,.15)}
+    .standalone-nav .page-title{font-size:.85rem;font-weight:600;color:var(--text2)}
+    .standalone-nav .page-badge{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(63,185,80,.12);color:var(--green)}
+    @media all{body.in-iframe .standalone-nav{display:none}}
+    .mfg-content{max-width:960px;margin:0 auto;padding:2.5rem 2rem 4rem}
+    .mfg-content h1{font-size:1.8rem;font-weight:700;margin-bottom:.5rem}
+    .mfg-content .subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+    .mfg-content h2{font-size:1.4rem;font-weight:700;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .mfg-content h3{font-size:1.15rem;font-weight:600;margin:1.5rem 0 .75rem}
+    .mfg-content p{margin-bottom:.75rem;color:var(--text);font-size:.92rem;line-height:1.7}
+    .mfg-content ul{margin:.5rem 0 1rem;padding-left:1.25rem;color:var(--text)}
+    .mfg-content li{font-size:.92rem;line-height:1.7;margin-bottom:.4rem}
+    .section-divider{border:none;height:2px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:3rem 0}
+    .toc{margin:1.5rem 0 2.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+    .toc-title{font-size:.85rem;font-weight:700;color:var(--text2);margin-bottom:.75rem}
+    .toc a{color:var(--blue);text-decoration:none;font-size:.88rem;display:block;padding:3px 0}
+    .toc a:hover{text-decoration:underline}
+    .fab-toc{position:fixed;bottom:2rem;right:2rem;z-index:999;width:48px;height:48px;border-radius:50%;background:var(--blue);border:2px solid rgba(88,166,255,.4);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+    .fab-toc:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(88,166,255,.4)}
+    .fab-toc.active{background:var(--bg3);border-color:var(--border)}
+    .float-toc{position:fixed;bottom:5.5rem;right:2rem;z-index:998;width:340px;max-height:70vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
+    .float-toc.show{display:block;animation:tocSlideIn .2s ease}
+    @keyframes tocSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .float-toc .toc-title{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:.6rem}
+    .float-toc a{color:var(--blue);text-decoration:none;font-size:.82rem;display:block;padding:4px 0}
+    .float-toc a:hover{text-decoration:underline;color:#fff}
+    body.in-iframe .fab-toc{bottom:1.5rem;right:1.5rem}
+    body.in-iframe .float-toc{bottom:4.5rem;right:1.5rem}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+    .tag{padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);color:var(--blue)}
+    .nav-links{display:flex;gap:8px;flex-wrap:wrap;margin:1.5rem 0}
+    .nav-links a{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;transition:all .15s}
+    .nav-links a:hover{background:rgba(88,166,255,.15)}
+    .note-box{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--orange);margin:.75rem 0;line-height:1.7}
+    .important-box{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--red);margin:.75rem 0;line-height:1.7}
+    .key-box{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--green);margin:.75rem 0;line-height:1.7}
+    .alert-box{background:rgba(188,140,255,.08);border:1px solid rgba(188,140,255,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--purple);margin:.75rem 0;line-height:1.7}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+    .trigger-box{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:1rem 1.25rem}
+    .trigger-box h3{font-size:1rem;font-weight:600;margin:0 0 .5rem;color:var(--text)}
+    .trigger-box p{font-size:.85rem;color:var(--text2);margin:0;line-height:1.7}
+    .trigger-box.t-green{border-left-color:var(--green)}.trigger-box.t-orange{border-left-color:var(--orange)}.trigger-box.t-purple{border-left-color:var(--purple)}.trigger-box.t-teal{border-left-color:var(--teal)}.trigger-box.t-red{border-left-color:var(--red)}.trigger-box.t-pink{border-left-color:var(--pink)}.trigger-box.t-coral{border-left-color:var(--coral)}.trigger-box.t-cyan{border-left-color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+    th{text-align:left;font-weight:600;font-size:.78rem;color:var(--text3);padding:8px 10px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    td{padding:10px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--text);line-height:1.7}
+    td strong{white-space:nowrap}
+    .field-spec td:first-child{white-space:nowrap;font-weight:600;color:var(--blue);width:180px}
+    .field-spec td:nth-child(2){color:var(--text2);font-size:.82rem}
+    @media(max-width:768px){.mfg-content{padding:1.5rem 1rem 3rem}.mfg-content h1{font-size:1.4rem}.grid-2,.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">← 인덱스</a>
+    <span class="page-title">휴가 기본설정</span>
+    <span class="page-badge">Setup</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>휴가 기본설정</h1>
+    <p class="subtitle">연차 관리의 핵심 정책을 설정하는 화면입니다. 마이너스 연차 허용, 휴가 자동부여, 생성기준(회계연도/입사일), 비례휴가 소수점 처리, 근속연수별 부여 설정, 자동이월 여부를 관리합니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">경로: 근태관리 &gt; 휴가 &gt; 휴가 설정 &gt; 기본설정</span>
+      <span class="tag">권한: 관리자</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">화면 개요</a>
+      <a href="#minus-leave">마이너스 연차</a>
+      <a href="#auto-grant">휴가 자동부여</a>
+      <a href="#creation-basis">휴가 생성기준</a>
+      <a href="#proportional">비례휴가 생성 기준설정</a>
+      <a href="#seniority">근속연수별 휴가부여 설정</a>
+      <a href="#auto-carry">휴가 자동이월 여부</a>
+      <a href="#save">저장</a>
+      <a href="#related">연결 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 1. 화면 개요 -->
+    <h2 id="overview">화면 개요</h2>
+    <p>휴가 설정 화면은 5개 탭으로 구성됩니다. 기본설정 탭에서는 연차 정책의 핵심 규칙을 정의합니다.</p>
+    <div class="grid-3" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="trigger-box t-green"><h3>기본설정</h3><p>연차 정책 설정<br>(현재 화면)</p></div>
+      <div class="trigger-box t-teal"><h3>휴가유형설정</h3><p>휴가 종류 등록·관리</p></div>
+      <div class="trigger-box t-orange"><h3>휴가부여·조정</h3><p>연차 수동 부여·차감</p></div>
+      <div class="trigger-box t-coral"><h3>휴가배포이력</h3><p>자동부여 배포 이력</p></div>
+      <div class="trigger-box t-purple"><h3>휴가이월·정산</h3><p>잔여연차 이월·소멸</p></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- 2. 마이너스 연차 -->
+    <h2 id="minus-leave">마이너스 연차</h2>
+    <p>잔여 연차가 0인 상태에서도 휴가를 신청할 수 있도록 허용하는 설정입니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>사용 (default)</h3>
+        <p>잔여 연차가 0이어도 최대허용개수 범위 내에서 휴가 상신이 가능합니다. 익년도 연차를 미리 사용하는 개념입니다.</p>
+      </div>
+      <div class="trigger-box t-coral">
+        <h3>미사용</h3>
+        <p>잔여 연차가 0이면 휴가 상신이 차단됩니다.</p>
+      </div>
+    </div>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>최대허용개수</td>
+          <td>마이너스 연차를 "사용"으로 설정했을 때 노출되는 숫자 입력 필드입니다. 기본값은 <strong>1</strong>이며, 최대 2자리 숫자까지 입력할 수 있습니다. 설정된 개수만큼 잔여 연차가 마이너스가 될 수 있습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note-box">마이너스 연차로 사용한 일수는 다음 연도 연차 부여 시 자동으로 차감됩니다. 퇴직 시 미정산된 마이너스 연차는 급여에서 공제 처리됩니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 3. 휴가 자동부여 -->
+    <h2 id="auto-grant">휴가 자동부여</h2>
+    <p>근속연수에 따라 연차를 자동으로 생성·부여하는 기능입니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-coral">
+        <h3>미사용 (default)</h3>
+        <p>담당자가 휴가부여·조정 메뉴에서 수동으로 연차를 부여합니다. 자동부여 기준 버튼이 비활성화됩니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>사용</h3>
+        <p>아래 기준에 따라 시스템이 자동으로 연차를 생성합니다.</p>
+      </div>
+    </div>
+
+    <h3>자동부여 기준</h3>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>1년 미만 근로자</td>
+          <td>입사일 기준 <strong>익월 1일 00시</strong>에 자동으로 1개씩 생성합니다. 매월 1개씩, 최대 11개까지 부여됩니다.</td>
+        </tr>
+        <tr>
+          <td>1년 이상 근로자</td>
+          <td>회계연도 기준 <strong>매년 1월 1일 00시</strong>에 근속연수에 따른 연차가 자동 생성됩니다. 기본 15일 + 가산휴가 + 이월분이 합산되어 부여됩니다.</td>
+        </tr>
+        <tr>
+          <td>대상</td>
+          <td><strong>재직 중인 근로자만</strong> 자동부여 대상에 포함됩니다. 퇴직·휴직 상태인 근로자는 제외됩니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>미사용에서 사용으로 변경 시 자동부여 로직</h3>
+    <p>자동부여를 "미사용"에서 "사용"으로 변경하면, 변경 시점을 기준으로 아직 부여되지 않은 연차를 소급하여 자동 생성합니다.</p>
+    <div class="trigger-box t-teal" style="margin:1rem 0">
+      <h3>입사일 기준 예시</h3>
+      <p>2025년 7월 1일 입사자가 있고, 10월에 자동부여를 켰다면 → 8월분(1개), 9월분(1개), 10월분(1개)이 일괄 생성됩니다.</p>
+    </div>
+    <div class="trigger-box t-orange" style="margin:1rem 0">
+      <h3>회계연도 기준 예시</h3>
+      <p>2026년 1월 1일에 이미 자동부여 시점이 지난 1년 이상 근로자가 있다면 → 해당 연도의 기본연차 + 가산휴가가 일괄 생성됩니다.</p>
+    </div>
+    <div class="important-box">자동부여 전환 시 이미 수동으로 부여된 연차가 있으면 중복 부여되지 않도록 기존 부여 이력을 확인한 뒤 처리됩니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 4. 휴가 생성기준 -->
+    <h2 id="creation-basis">휴가 생성기준</h2>
+    <p>연차가 새로 생성되는 기준 시점을 선택합니다. 회사의 연차 관리 정책에 따라 두 가지 방식 중 하나를 선택합니다.</p>
+
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>회계연도 (default)</h3>
+        <p>매년 <strong>1월 1일 00시</strong>에 전 직원의 신규 연차를 일괄 생성합니다.</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>입사일자</h3>
+        <p>근로자별 <strong>입사일자 당일 00시</strong>에 개인별로 신규 연차를 생성합니다.</p>
+      </div>
+    </div>
+
+    <h3>회계연도 기준 상세</h3>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>1년 이상 근로자</td>
+          <td>기본 15일 + 근속연수별 가산휴가 + 전년도 이월분을 합산하여 1월 1일에 부여합니다.</td>
+        </tr>
+        <tr>
+          <td>1년 미만 근로자</td>
+          <td>전년도 근속기간에 비례한 <strong>비례연차</strong> + 전년도 이월분을 합산하여 1월 1일에 부여합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>입사일자 기준 상세</h3>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>1년 이상 근로자</td>
+          <td>입사일자 도래 시 기본 15일 + 근속연수별 가산휴가 + 이월분을 합산하여 부여합니다.</td>
+        </tr>
+        <tr>
+          <td>1년 미만 근로자</td>
+          <td>매월 <strong>월차 1개</strong>씩 자동 생성됩니다. 입사 1년이 도래하면 기본 15일 + 이월분으로 전환됩니다. 1년 미만 기간에 사용한 월차는 15일에서 차감됩니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note-box">휴가 생성기준은 한 번 설정하면 운영 중 변경 시 기존 부여 이력과 충돌이 발생할 수 있으므로, 서비스 초기에 확정하는 것을 권장합니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 5. 비례휴가 생성 기준설정 -->
+    <h2 id="proportional">비례휴가 생성 기준설정</h2>
+    <p>1년 미만 근로자에 대해 <strong>회계연도 기준</strong>으로 연차를 생성할 때, 비례연차의 소수점 처리 방식을 설정합니다.</p>
+
+    <div class="grid-3">
+      <div class="trigger-box t-green">
+        <h3>올림 (default)</h3>
+        <p>소수점이 발생하면 무조건 올림 처리합니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>반올림</h3>
+        <p>소수점 이하를 반올림 처리합니다.</p>
+      </div>
+      <div class="trigger-box">
+        <h3>유지</h3>
+        <p>소수점을 그대로 유지합니다.</p>
+      </div>
+    </div>
+
+    <h3>비례연차 산출 공식</h3>
+    <div class="key-box">전년도 근속기간 비례분 = (입사년 재직일 / 365일) x 15일</div>
+
+    <h3>계산 예시</h3>
+    <div class="trigger-box t-teal" style="margin:1rem 0">
+      <h3>2025년 7월 1일 입사자</h3>
+      <p>2026년 1월 1일 비례연차 산출:<br>
+      재직일수 = 2025.7.1 ~ 2025.12.31 = <strong>184일</strong><br>
+      비례연차 = (184 / 365) x 15 = <strong>7.56일</strong><br><br>
+      올림 적용 시 → <strong>8일</strong> 부여<br>
+      반올림 적용 시 → <strong>8일</strong> 부여<br>
+      유지 적용 시 → <strong>7.56일</strong> 부여</p>
+    </div>
+    <div class="note-box">비례휴가 설정은 "휴가 생성기준"이 회계연도인 경우에만 적용됩니다. 입사일자 기준에서는 월차 방식으로 운영되므로 이 설정이 영향을 주지 않습니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 6. 근속연수별 휴가부여 설정 -->
+    <h2 id="seniority">근속연수별 휴가부여 설정</h2>
+    <p>근속연수에 따라 부여되는 연차 일수를 관리하는 테이블입니다. 기본 테이블은 근로기준법에 따라 자동 구성되며 삭제할 수 없고, 휴가일수와 비고만 수정할 수 있습니다.</p>
+
+    <h3>가산휴가 공식</h3>
+    <div class="key-box">3년 차부터 가산: 15 + {(근속연수 - 1) / 2}일 (소수점 버림), 최대 25일</div>
+
+    <table>
+      <thead>
+        <tr><th>근속연수</th><th>휴가일수</th><th>산출근거</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1년</td><td>15일</td><td>기본 연차</td></tr>
+        <tr><td>2년</td><td>15일</td><td>기본 연차</td></tr>
+        <tr><td>3년</td><td>16일</td><td>15 + (3-1)/2 = 15 + 1</td></tr>
+        <tr><td>4년</td><td>16일</td><td>15 + (4-1)/2 = 15 + 1 (소수점 버림)</td></tr>
+        <tr><td>5년</td><td>17일</td><td>15 + (5-1)/2 = 15 + 2</td></tr>
+        <tr><td>...</td><td>...</td><td>...</td></tr>
+        <tr><td>21년 이상</td><td>25일</td><td>최대 한도</td></tr>
+      </tbody>
+    </table>
+
+    <ul>
+      <li><strong>수정 버튼</strong>을 클릭해야 휴가일수와 비고 컬럼이 활성화됩니다.</li>
+      <li>회사 내규에 따라 법정 기준보다 더 많은 일수를 설정할 수 있습니다.</li>
+      <li>기본 테이블의 행은 삭제할 수 없습니다.</li>
+    </ul>
+    <div class="important-box">근속연수별 휴가일수를 법정 기준보다 적게 설정하면 근로기준법 위반에 해당할 수 있습니다. 반드시 법정 기준 이상으로 설정하십시오.</div>
+
+    <hr class="section-divider">
+
+    <!-- 7. 휴가 자동이월 여부 -->
+    <h2 id="auto-carry">휴가 자동이월 여부</h2>
+    <p>전년도 미사용 연차를 다음 연도로 자동 이월할지 여부를 설정합니다.</p>
+
+    <div class="grid-2">
+      <div class="trigger-box t-coral">
+        <h3>미사용 (default)</h3>
+        <p>자동이월이 되지 않습니다. 휴가이월·정산 메뉴에서 담당자가 수동으로 이월 처리해야 합니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>사용</h3>
+        <p><strong>유급휴가만</strong> 자동이월됩니다. 무급휴가는 유효기간에 따라 소멸됩니다.</p>
+      </div>
+    </div>
+
+    <h3>자동이월 적용 규칙</h3>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>유급휴가</td>
+          <td>전년도 미사용분이 다음 연도 생성 시 자동으로 합산됩니다.</td>
+        </tr>
+        <tr>
+          <td>무급휴가</td>
+          <td>자동이월 대상이 아닙니다. 휴가유형에 설정된 유효기간에 따라 자동 소멸됩니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>미사용에서 사용으로 변경 시 이월 로직</h3>
+    <div class="trigger-box t-teal" style="margin:1rem 0">
+      <h3>입사일 기준</h3>
+      <p>변경 시점 이후 도래하는 입사일자에 맞춰, 전년도 미사용 유급휴가가 자동이월 처리됩니다. 이미 입사일이 지난 근로자는 다음 입사일 도래 시 적용됩니다.</p>
+    </div>
+    <div class="trigger-box t-orange" style="margin:1rem 0">
+      <h3>회계연도 기준</h3>
+      <p>변경 시점 이후 도래하는 1월 1일에 전년도 미사용 유급휴가가 자동이월 처리됩니다. 이미 1월 1일이 지난 상태라면 다음 연도 1월 1일에 적용됩니다.</p>
+    </div>
+    <div class="note-box">자동이월 전환 시 기존에 이미 소멸 처리된 연차는 복구되지 않습니다. 전환 이후 새로 도래하는 시점부터 적용됩니다.</div>
+
+    <hr class="section-divider">
+
+    <!-- 8. 저장 -->
+    <h2 id="save">저장</h2>
+    <p>설정 변경 후 저장 버튼을 클릭하면 확인 메시지가 표시됩니다.</p>
+    <ul>
+      <li><strong>수정사항이 있는 경우</strong>: "설정한 값을 저장하시겠습니까? 저장 시 업무설정 적용을 위해 실행 중인 모든 메뉴가 종료됩니다."</li>
+      <li><strong>수정사항이 없는 경우</strong>: "설정한 값을 저장하시겠습니까?"</li>
+    </ul>
+    <div class="important-box">저장 시 모든 탭이 닫히고 메인 화면으로 이동합니다. 저장 전에 모든 설정값을 반드시 확인하십시오.</div>
+
+    <hr class="section-divider">
+
+    <!-- 9. 연결 문서 -->
+    <h2 id="related">연결 문서</h2>
+    <div class="nav-links">
+      <a href="휴가유형설정.html" target="_top">휴가유형 설정 →</a>
+      <a href="휴가부여조정.html" target="_top">휴가부여·조정 →</a>
+      <a href="휴가배포이력.html" target="_top">휴가배포이력 →</a>
+      <a href="휴가이월정산.html" target="_top">휴가이월·정산 →</a>
+    </div>
+  </div>
+
+  <button class="fab-toc" id="fabToc" title="목차 열기">☰</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">화면 개요</a>
+    <a href="#minus-leave">마이너스 연차</a>
+    <a href="#auto-grant">휴가 자동부여</a>
+    <a href="#creation-basis">휴가 생성기준</a>
+    <a href="#proportional">비례휴가 생성 기준설정</a>
+    <a href="#seniority">근속연수별 휴가부여 설정</a>
+    <a href="#auto-carry">휴가 자동이월 여부</a>
+    <a href="#save">저장</a>
+    <a href="#related">연결 문서</a>
+  </div>
+
+  <script>
+    if(window.self!==window.top)document.body.classList.add('in-iframe');
+    const fab=document.getElementById('fabToc'),ftoc=document.getElementById('floatToc');
+    fab.addEventListener('click',()=>{const o=ftoc.classList.toggle('show');fab.classList.toggle('active',o)});
+    document.addEventListener('click',e=>{if(!fab.contains(e.target)&&!ftoc.contains(e.target)){ftoc.classList.remove('show');fab.classList.remove('active')}});
+  </script>
+</body>
+</html>

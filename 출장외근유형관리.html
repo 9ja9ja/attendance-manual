@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>출장·외근 유형 관리 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --blue: #58a6ff;
+      --blue-bg: #0d1f3c;
+      --green: #3fb950;
+      --green-bg: #0d2818;
+      --orange: #d29922;
+      --orange-bg: #2a1e00;
+      --red: #f85149;
+      --red-bg: #3b1116;
+      --purple: #bc8cff;
+      --purple-bg: #1e0e3e;
+      --teal: #39d9c1;
+      --teal-bg: #0a2e2a;
+      --pink: #f778ba;
+      --pink-bg: #3a1228;
+      --coral: #ea8a5e;
+      --coral-bg: #2c1a0e;
+      --cyan: #56d4dd;
+      --cyan-bg: #0a2a2e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Standalone navigation bar - hidden inside iframe */
+    .standalone-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .standalone-nav .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .standalone-nav .back-btn:hover { background: rgba(88,166,255,0.15); }
+    .standalone-nav .page-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .standalone-nav .page-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(63,185,80,0.12);
+      color: var(--green);
+    }
+    @media all { body.in-iframe .standalone-nav { display: none; } }
+
+    .mfg-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+    .mfg-content h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .mfg-content .subtitle {
+      color: var(--text2);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .mfg-content h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .mfg-content h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+    }
+    .mfg-content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--text2);
+    }
+    .mfg-content p {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+    .mfg-content ul {
+      margin: 0.5rem 0 1rem;
+      padding-left: 1.25rem;
+      color: var(--text);
+    }
+    .mfg-content li {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 0.4rem;
+    }
+    .section-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 3rem 0;
+    }
+
+    /* TOC */
+    .toc {
+      margin: 1.5rem 0 2.5rem;
+      padding: 1.25rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .toc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 0.75rem;
+    }
+    .toc a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.88rem;
+      display: block;
+      padding: 3px 0;
+    }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Floating TOC */
+    .fab-toc {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--blue); border: 2px solid rgba(88,166,255,0.4);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab-toc:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background: var(--bg3); border-color: var(--border); }
+    .float-toc {
+      position: fixed; bottom: 5.5rem; right: 2rem; z-index: 998;
+      width: 340px; max-height: 70vh; overflow-y: auto;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .float-toc.show { display: block; animation: tocSlideIn 0.2s ease; }
+    @keyframes tocSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .float-toc .toc-title { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 0.6rem; }
+    .float-toc a { color: var(--blue); text-decoration: none; font-size: 0.82rem; display: block; padding: 4px 0; }
+    .float-toc a:hover { text-decoration: underline; color: #fff; }
+    body.in-iframe .fab-toc { bottom: 1.5rem; right: 1.5rem; }
+    body.in-iframe .float-toc { bottom: 4.5rem; right: 1.5rem; }
+
+    /* Tag row */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+    .tag {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      color: var(--blue);
+    }
+
+    /* Nav links */
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.5rem 0; }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: rgba(88,166,255,0.15); }
+
+    /* Boxes */
+    .note-box {
+      background: rgba(210,153,34,0.08);
+      border: 1px solid rgba(210,153,34,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--orange);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .important-box {
+      background: rgba(248,81,73,0.08);
+      border: 1px solid rgba(248,81,73,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--red);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .key-box {
+      background: rgba(63,185,80,0.08);
+      border: 1px solid rgba(63,185,80,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--green);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .diff-box {
+      background: rgba(188,140,255,0.08);
+      border: 1px solid rgba(188,140,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--purple);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .formula-box {
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--blue);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+
+    /* Grid & Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1rem 0; }
+    .trigger-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .trigger-box h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .trigger-box p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.7;
+    }
+    .trigger-box.t-green { border-left-color: var(--green); }
+    .trigger-box.t-orange { border-left-color: var(--orange); }
+    .trigger-box.t-purple { border-left-color: var(--purple); }
+    .trigger-box.t-teal { border-left-color: var(--teal); }
+    .trigger-box.t-red { border-left-color: var(--red); }
+    .trigger-box.t-pink { border-left-color: var(--pink); }
+    .trigger-box.t-coral { border-left-color: var(--coral); }
+    .trigger-box.t-cyan { border-left-color: var(--cyan); }
+
+    /* Flow steps */
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flow-step strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+    .flow-step p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text3);
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    code {
+      color: var(--blue);
+      font-family: Consolas, monospace;
+    }
+
+    @media (max-width: 768px) {
+      .mfg-content { padding: 1.5rem 1rem 3rem; }
+      .mfg-content h1 { font-size: 1.4rem; }
+      .grid-2, .grid-3, .grid-4, .flow-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">← 인덱스</a>
+    <span class="page-title">출장·외근 유형 관리</span>
+    <span class="page-badge">Trip / Outside Work</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>출장·외근 유형 관리는 타각이 부족한 업무를 간주근무로 보정하는 계산 정책 화면입니다</h1>
+    <p class="subtitle"><code>출장유형 설정</code> 화면은 출장명만 관리하는 사전이 아닙니다. 출퇴근을 인정할지, 근무시간을 자동 인정할지, 몇 시간을 인정할지, 휴게를 몇 시간으로 볼지, 휴일근무와 연장·야간을 같이 인정할지까지 정해서 실제 타각이 없거나 불완전한 업무를 근태 계산에서 어떻게 반영할지를 결정하는 정책 화면입니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">메뉴: 출장유형 설정</span>
+      <span class="tag">관련 기능: 출장유형 등록</span>
+      <span class="tag">핵심 역할: 간주근무, 인정시간, 휴일/연장/야간 분기</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#why">화면이 중요한 이유</a>
+      <a href="#structure">기본 구조</a>
+      <a href="#fields">등록·수정 시 입력하는 상세 정책</a>
+      <a href="#calc">핵심 정책별 계산 해석</a>
+      <a href="#examples">정책 조합 예시</a>
+      <a href="#caution">운영 시 주의할 점</a>
+      <a href="#closing">인정근로시간·월마감과의 연결</a>
+      <a href="#checklist">운영 체크리스트</a>
+      <a href="#related">같이 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="why">화면이 중요한 이유</h2>
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>타각 대체 기준</h3>
+        <p>출장, 외근, 현장업무처럼 정상적인 출퇴근 타각이 어려운 경우가 있습니다. 이 화면은 그런 케이스를 자동 인정으로 처리할지, 실제 타각이 있어야만 인정할지, 정해진 근무시간을 간주로 넣을지 결정합니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>가산시간 분해 기준</h3>
+        <p>연장, 야간, 휴일 여부를 이 유형에서 같이 판단하도록 설계되어 있어, 단순 근무시간 인정만이 아니라 수당성 시간 분해 규칙까지 함께 관리하는 화면으로 봐야 합니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="structure">기본 구조</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>영역</th>
+          <th>화면 내용</th>
+          <th>매뉴얼 해석</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>검색 영역</td>
+          <td>출장 유형 목록을 조회하기 위한 기본 검색영역이 존재합니다.</td>
+          <td>사용 중인 유형, 사용 종료 유형, 특정 출장명 등을 운영자가 빠르게 찾아볼 수 있는 목록형 관리 화면입니다.</td>
+        </tr>
+        <tr>
+          <td>리스트 영역</td>
+          <td>등록된 출장 유형이 표 형태로 노출됩니다.</td>
+          <td>목록에서 어떤 간주 정책이 현재 운영 중인지 한눈에 확인할 수 있어야 하므로 사용여부, 유형명, 인정규칙이 핵심 노출 값입니다.</td>
+        </tr>
+        <tr>
+          <td>등록 화면</td>
+          <td>출장유형 등록 화면에서 신규 출장 유형을 생성합니다.</td>
+          <td>정책 변경이 잦을 수 있으므로 목록과 별도 팝업으로 생성·수정하는 구조입니다.</td>
+        </tr>
+        <tr>
+          <td>수정/삭제/저장</td>
+          <td>유형을 수정하거나 삭제하고, 취소와 저장 버튼이 함께 제공됩니다.</td>
+          <td>간주근무 정책은 과거 근태에 영향을 줄 수 있으므로 취소, 저장, 사용여부 전환 흐름이 분명해야 합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="fields">등록·수정 시 입력하는 상세 정책</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>필드</th>
+          <th>설정 기준</th>
+          <th>업무 의미</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>근태 유형</td>
+          <td>기본값 고정: 출장</td>
+          <td>이 화면이 휴가나 일반 근태 수정이 아니라 출장/외근 계열 간주근무 정책 화면임을 명확히 합니다.</td>
+        </tr>
+        <tr>
+          <td>출장 구분(출장명)</td>
+          <td>유형명 입력</td>
+          <td>직원이 신청서에서 선택하게 될 실사용 명칭입니다. 국내출장, 당일외근, 현장지원, 고객사상주 같은 업무 유형을 정의합니다.</td>
+        </tr>
+        <tr>
+          <td>출장 인정 단위</td>
+          <td>일자 / 기간</td>
+          <td>하루 단위 출장인지, 시작일과 종료일이 있는 기간형 출장인지 구분합니다. 신청서 UI와 계산 단위가 달라집니다.</td>
+        </tr>
+        <tr>
+          <td>출/퇴근 인정</td>
+          <td>인정 / 미인정</td>
+          <td>타각이 없더라도 출근과 퇴근으로 간주할지 정합니다. 미인정이면 별도 타각 또는 보정 요청이 필요할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>근무 인정 시간</td>
+          <td>시간 + 분 선택</td>
+          <td>정해진 출장 유형에 대해 몇 시간을 근무로 볼지 결정합니다. 간주근무의 핵심 기준값입니다.</td>
+        </tr>
+        <tr>
+          <td>휴게 인정 시간</td>
+          <td>시간 입력</td>
+          <td>간주 근무시간 안에 몇 시간을 휴게로 볼지 정합니다. 실제 근무시간과 휴게시간을 분리해 저장하는 구조가 필요합니다.</td>
+        </tr>
+        <tr>
+          <td>근무 시간 자동 인정</td>
+          <td>사용 / 미사용</td>
+          <td>승인만으로 자동 근무시간을 생성할지, 실제 타각 또는 추가 보정이 있어야 하는지 결정합니다.</td>
+        </tr>
+        <tr>
+          <td>휴일 근무 인정</td>
+          <td>휴일 포함 / 휴일 제외</td>
+          <td>휴일에 발생한 출장도 휴일근무로 집계할지 여부를 정합니다. 휴일수당 계산과 직접 연결됩니다.</td>
+        </tr>
+        <tr>
+          <td>연장/야간 근무 인정</td>
+          <td>인정 / 미인정</td>
+          <td>출장 시간 안에서 연장 또는 야간 가산시간을 추가로 분리할 수 있는지 결정합니다.</td>
+        </tr>
+        <tr>
+          <td>사용여부</td>
+          <td>사용 / 미사용</td>
+          <td>신규 신청 가능 여부를 통제합니다. 과거 이력은 유지하고 신규 사용만 막는 운영 제어용 필드입니다.</td>
+        </tr>
+        <tr>
+          <td>비고</td>
+          <td>설명 입력</td>
+          <td>정책 해석, 예외 처리 기준, 사용 부서 제한 같은 운영 메모를 남기는 필드입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="calc">핵심 정책별 계산 해석</h2>
+    <div class="note-box">근태 계산과 직접 연결되는 항목</div>
+    <table>
+      <thead>
+        <tr>
+          <th>정책 항목</th>
+          <th>설정값</th>
+          <th>근태 계산 반영 방식</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>출/퇴근 인정</td>
+          <td>인정</td>
+          <td>실제 타각이 없더라도 출장 승인 데이터만으로 출근/퇴근 구간을 간주 생성할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>출/퇴근 인정</td>
+          <td>미인정</td>
+          <td>출장 승인만으로는 근무구간을 확정하지 못하므로 실제 타각, 수기보정, 별도 근태요청이 필요할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>근무 시간 자동 인정</td>
+          <td>사용</td>
+          <td>신청 승인 후 유형에 정의된 근무 인정 시간과 휴게 인정 시간을 바탕으로 일별 간주근무 구간을 자동 생성합니다.</td>
+        </tr>
+        <tr>
+          <td>근무 시간 자동 인정</td>
+          <td>미사용</td>
+          <td>출장 상태는 남기되 인정근로시간은 별도 타각 또는 보정결과를 사용합니다.</td>
+        </tr>
+        <tr>
+          <td>휴일 근무 인정</td>
+          <td>휴일 포함</td>
+          <td>휴일에 적용된 출장도 휴일근무시간으로 집계할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>휴일 근무 인정</td>
+          <td>휴일 제외</td>
+          <td>휴일에 출장 일정이 있어도 휴일근무로는 보지 않거나 별도 수기판정을 요구하는 정책이 됩니다.</td>
+        </tr>
+        <tr>
+          <td>연장/야간 근무 인정</td>
+          <td>인정</td>
+          <td>간주된 근무구간 안에서도 기준시각을 넘긴 시간은 연장 또는 야간시간으로 다시 분해합니다.</td>
+        </tr>
+        <tr>
+          <td>연장/야간 근무 인정</td>
+          <td>미인정</td>
+          <td>출장 인정 시간은 총 근무시간에는 포함되더라도 가산시간으로는 분리되지 않습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="examples">정책 조합 예시</h2>
+    <div class="grid-3">
+      <div class="trigger-box t-teal">
+        <h3>예시 1. 당일 출장</h3>
+        <p>출/퇴근 인정 = 인정, 근무 시간 자동 인정 = 사용, 근무 인정 시간 = 8시간, 휴게 인정 시간 = 1시간이면 타각이 없어도 8시간 간주근무와 1시간 휴게가 자동 생성됩니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>예시 2. 현장 외근</h3>
+        <p>출/퇴근 인정 = 미인정, 자동 인정 = 미사용이면 출장 상태만 기록하고 실제 타각 또는 관리자 보정을 별도로 받아야 합니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>예시 3. 휴일 행사 지원</h3>
+        <p>휴일 근무 인정 = 휴일 포함, 연장/야간 인정 = 인정이면 휴일 출장도 휴일근무시간과 야간시간으로 추가 분해할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="caution">운영 시 주의할 점</h2>
+    <ul>
+      <li>출장 유형은 단순 분류가 아니라 근태 계산 기준이므로, 이름 변경보다 인정 규칙 변경이 훨씬 큰 영향도를 가집니다.</li>
+      <li>근무 인정 시간과 휴게 인정 시간을 함께 들고 있어야 총 체류시간과 실근로시간을 분리할 수 있습니다.</li>
+      <li>자동 인정이 켜진 유형은 승인만으로 근무시간이 생성되므로, 승인 완료 시점과 마감 반영 시점의 관계를 명확히 정의해야 합니다.</li>
+      <li>휴일 포함 여부와 연장/야간 인정 여부는 총 인정시간과 가산시간을 분리 저장해야 한다는 신호입니다.</li>
+      <li>기간 단위 출장 유형은 시작일과 종료일 사이의 일자별 분해 규칙도 함께 필요합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="closing">인정근로시간·월마감과의 연결</h2>
+    <div class="grid-2">
+      <div class="trigger-box t-coral">
+        <h3>일별 판정 단계</h3>
+        <p>출장 신청이 승인되면 시스템은 먼저 출장유형 기준정보를 읽고, 자동 인정 여부에 따라 예상 근무 프레임을 대체하거나 실제 타각과 결합합니다. 이때 근무 인정 시간과 휴게 인정 시간이 함께 적용됩니다.</p>
+      </div>
+      <div class="trigger-box t-pink">
+        <h3>가산시간 분해 단계</h3>
+        <p>휴일 포함 여부와 연장/야간 인정 여부를 확인해서 총 인정근로시간과 별도로 휴일근무시간, 연장근무시간, 야간근무시간을 분해합니다.</p>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>마감 결과 항목</th>
+          <th>출장유형 설정의 영향</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>인정근로시간</td>
+          <td>근무 인정 시간, 자동 인정 여부, 출퇴근 인정 여부가 직접 영향을 줍니다.</td>
+        </tr>
+        <tr>
+          <td>휴게시간</td>
+          <td>휴게 인정 시간이 별도 저장되어야 실근로시간과 구분할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>휴일근무시간</td>
+          <td>휴일 근무 인정이 켜져 있을 때만 휴일시간으로 분류됩니다.</td>
+        </tr>
+        <tr>
+          <td>연장/야간시간</td>
+          <td>연장·야간 인정이 켜져 있을 때만 가산시간 분해를 허용합니다.</td>
+        </tr>
+        <tr>
+          <td>근태이상 여부</td>
+          <td>자동 인정이 꺼져 있고 타각이 부족하면 이상건으로 남을 수 있습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note-box">
+      출장유형은 사실상 <strong>간주근무 기준</strong>으로 운영됩니다. 따라서 월마감에서도 출장 승인 데이터는 단순 상태 데이터가 아니라 인정근로시간 보정용 입력원천으로 취급하는 것이 맞습니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="checklist">운영 체크리스트</h2>
+    <ul>
+      <li>출장 유형을 만들 때는 출장명보다 자동 인정 여부와 인정 시간을 먼저 결정합니다.</li>
+      <li>휴일 포함 여부와 연장·야간 인정 여부는 급여 반영까지 이어지므로 실제 보상정책과 맞는지 검토합니다.</li>
+      <li>기간형 출장은 일자별 분해 로직을 별도 문서로 보완합니다.</li>
+      <li>자동 인정이 켜진 유형은 승인 취소, 변경, 반려 시 이미 생성된 근무시간을 어떻게 되돌릴지 로그 정책을 같이 준비합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="related">같이 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="휴가관리.html" target="_top">휴가 관리 →</a>
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간·월마감 →</a>
+      <a href="근로제관리.html" target="_top">근로제 관리 →</a>
+    </div>
+  </div>
+
+  <!-- Floating TOC -->
+  <button class="fab-toc" id="fabToc" title="목차 열기">☰</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#why">화면이 중요한 이유</a>
+    <a href="#structure">기본 구조</a>
+    <a href="#fields">등록·수정 시 상세 정책</a>
+    <a href="#calc">핵심 정책별 계산 해석</a>
+    <a href="#examples">정책 조합 예시</a>
+    <a href="#caution">운영 시 주의할 점</a>
+    <a href="#closing">인정근로시간·월마감 연결</a>
+    <a href="#checklist">운영 체크리스트</a>
+    <a href="#related">같이 보면 좋은 문서</a>
+  </div>
+
+  <script>
+    // iframe detection
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+
+    // Floating TOC toggle
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

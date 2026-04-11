@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인정근로시간 및 월 근태 마감 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --blue: #58a6ff;
+      --blue-bg: #0d1f3c;
+      --green: #3fb950;
+      --green-bg: #0d2818;
+      --orange: #d29922;
+      --orange-bg: #2a1e00;
+      --red: #f85149;
+      --red-bg: #3b1116;
+      --purple: #bc8cff;
+      --purple-bg: #1e0e3e;
+      --teal: #39d9c1;
+      --teal-bg: #0a2e2a;
+      --pink: #f778ba;
+      --pink-bg: #3a1228;
+      --coral: #ea8a5e;
+      --coral-bg: #2c1a0e;
+      --cyan: #56d4dd;
+      --cyan-bg: #0a2a2e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Standalone navigation bar - hidden inside iframe */
+    .standalone-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .standalone-nav .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .standalone-nav .back-btn:hover { background: rgba(88,166,255,0.15); }
+    .standalone-nav .page-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .standalone-nav .page-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(63,185,80,0.12);
+      color: var(--green);
+    }
+    @media all { body.in-iframe .standalone-nav { display: none; } }
+
+    .mfg-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+    .mfg-content h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .mfg-content .subtitle {
+      color: var(--text2);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .mfg-content h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .mfg-content h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+    }
+    .mfg-content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--text2);
+    }
+    .mfg-content p {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+    .mfg-content ul {
+      margin: 0.5rem 0 1rem;
+      padding-left: 1.25rem;
+      color: var(--text);
+    }
+    .mfg-content li {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 0.4rem;
+    }
+    .section-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 3rem 0;
+    }
+
+    /* TOC */
+    .toc {
+      margin: 1.5rem 0 2.5rem;
+      padding: 1.25rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .toc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 0.75rem;
+    }
+    .toc a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.88rem;
+      display: block;
+      padding: 3px 0;
+    }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Floating TOC */
+    .fab-toc {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--blue); border: 2px solid rgba(88,166,255,0.4);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab-toc:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background: var(--bg3); border-color: var(--border); }
+    .float-toc {
+      position: fixed; bottom: 5.5rem; right: 2rem; z-index: 998;
+      width: 340px; max-height: 70vh; overflow-y: auto;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .float-toc.show { display: block; animation: tocSlideIn 0.2s ease; }
+    @keyframes tocSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .float-toc .toc-title { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 0.6rem; }
+    .float-toc a { color: var(--blue); text-decoration: none; font-size: 0.82rem; display: block; padding: 4px 0; }
+    .float-toc a:hover { text-decoration: underline; color: #fff; }
+    body.in-iframe .fab-toc { bottom: 1.5rem; right: 1.5rem; }
+    body.in-iframe .float-toc { bottom: 4.5rem; right: 1.5rem; }
+
+    /* Tag row */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+    .tag {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      color: var(--blue);
+    }
+
+    /* Nav links */
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.5rem 0; }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: rgba(88,166,255,0.15); }
+
+    /* Boxes */
+    .note-box {
+      background: rgba(210,153,34,0.08);
+      border: 1px solid rgba(210,153,34,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--orange);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .important-box {
+      background: rgba(248,81,73,0.08);
+      border: 1px solid rgba(248,81,73,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--red);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .key-box {
+      background: rgba(63,185,80,0.08);
+      border: 1px solid rgba(63,185,80,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--green);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .diff-box {
+      background: rgba(188,140,255,0.08);
+      border: 1px solid rgba(188,140,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--purple);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .formula-box {
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--blue);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+
+    /* Grid & Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1rem 0; }
+    .trigger-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .trigger-box h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .trigger-box p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.7;
+    }
+    .trigger-box.t-green { border-left-color: var(--green); }
+    .trigger-box.t-orange { border-left-color: var(--orange); }
+    .trigger-box.t-purple { border-left-color: var(--purple); }
+    .trigger-box.t-teal { border-left-color: var(--teal); }
+    .trigger-box.t-red { border-left-color: var(--red); }
+    .trigger-box.t-pink { border-left-color: var(--pink); }
+    .trigger-box.t-coral { border-left-color: var(--coral); }
+    .trigger-box.t-cyan { border-left-color: var(--cyan); }
+
+    /* Flow steps */
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .flow-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flow-step strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+    .flow-step p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text3);
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+      .mfg-content { padding: 1.5rem 1rem 3rem; }
+      .mfg-content h1 { font-size: 1.4rem; }
+      .grid-2, .grid-3, .grid-4, .flow-row, .flow-row-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">&larr; 인덱스</a>
+    <span class="page-title">인정근로시간&middot;월마감</span>
+    <span class="page-badge">Close Logic</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>인정근로시간은 일별 분류 데이터를 만든 뒤 월 근태 마감으로 확정합니다</h1>
+    <p class="subtitle">이 서비스는 <code>근로제 &rarr; 근무패턴 &rarr; 예상 출퇴근 시간 &rarr; 직원 출/퇴근 저장 &rarr; 집계마감 기준데이터 생성</code> 구조를 전제로 설계되어 있습니다. 따라서 월마감은 출퇴근기록을 단순 합산하는 절차가 아니라, 정상 출퇴근, 연장 인정, 근태 이상, 휴일 근무로 분류된 일별 기준데이터를 공식 결과로 확정하는 단계입니다.</p>
+
+    <div class="tag-row">
+
+      <span class="tag">핵심 분류: 정상 / 연장 / 이상 / 휴일</span>
+      <span class="tag">최종 산출: 월마감 확정 결과</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#principles">월마감 계산의 기본 원칙</a>
+      <a href="#flow">전체 흐름</a>
+      <a href="#input-priority">입력 원천과 우선순위</a>
+      <a href="#work-type-diff">표준/시차 근로제와 선택 근로제의 차이</a>
+      <a href="#daily-steps">일별 판정 상세 단계</a>
+      <a href="#classification">집계마감 기준데이터 분류</a>
+      <a href="#daily-formula">일별 산식과 결과 컬럼</a>
+      <a href="#monthly-closing">월 집계와 급여 연동</a>
+      <a href="#checklist">마감 전 체크리스트</a>
+      <a href="#exceptions">예외 처리와 보정 로그</a>
+      <a href="#implementation">현재 구조에서의 운영 기준</a>
+      <a href="#related">함께 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="principles">월마감 계산의 기본 원칙</h2>
+    <div class="note-box" style="display:inline-block; margin-bottom:0.75rem;">최종안 핵심 요약</div>
+    <ul>
+      <li>타각만으로 확정하지 않고, 근로제&middot;근무패턴&middot;승인 완료 데이터&middot;유형 기준정보를 함께 봅니다.</li>
+      <li>예상 출퇴근 시간은 실제 출퇴근과 별개로 존재하는 비교 프레임입니다.</li>
+      <li>총 인정근로시간과 연장&middot;야간&middot;휴일 시간은 속성 분해 방식으로 별도 관리합니다.</li>
+      <li>일별 분류 데이터를 먼저 만들고, 월마감은 그 데이터를 집계&middot;검토&middot;확정하는 단계입니다.</li>
+      <li>마감 후 결과는 급여 반영용 확정 자료로 사용합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="flow">전체 흐름</h2>
+
+    <div class="flow-row-3">
+      <div class="flow-step">
+        <strong>1. 근로제 등록</strong>
+        <p>근무 유형과 기본 소정 조건을 정의합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>2. 근로제 유형 설정</strong>
+        <p><code>표준/시차 근로제</code>와 <code>선택 근로제</code> 흐름이 분기됩니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>3. 정보/정책 설정</strong>
+        <p>근로제 정보와 정책 설정이 계산 기준값을 만듭니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>4. 근무 패턴 추가</strong>
+        <p>요일별 근무 프레임과 반복 기준을 구체화합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>5. 예상 출퇴근 수립</strong>
+        <p>직원별 일자 기준 예상 출퇴근 시간 프레임을 생성합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>6. 직원 출퇴근 저장</strong>
+        <p>실제 출근/퇴근 실적을 저장합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>7. 기준데이터 생성</strong>
+        <p>정상 출퇴근, 연장 인정, 근태 이상, 휴일 근무로 분류합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>8. 월 집계와 확정</strong>
+        <p>관리자 검토 후 월마감 결과와 급여 반영 자료를 확정합니다.</p>
+      </div>
+      <div class="flow-step">
+        <strong>9. 급여 반영</strong>
+        <p>확정 결과를 급여 계산의 공식 기준으로 사용합니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="input-priority">입력 원천과 우선순위</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>우선순위</th>
+          <th>입력 원천</th>
+          <th>매뉴얼 해석</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>개인별 확정 스케줄 / 캘린더 / 근로제</td><td>근무일인지 휴일인지, 소정근로시간이 얼마인지, 어떤 유형의 근로제인지 판정하는 최상위 기준입니다.</td></tr>
+        <tr><td>2</td><td>근무패턴 / 예상 출퇴근 프레임</td><td>정상 범위와 비교 기준을 만듭니다. 별도 단계이므로 독립 입력값으로 보는 것이 맞습니다.</td></tr>
+        <tr><td>3</td><td>승인 완료된 근태 기안</td><td>휴가, 출장, 외근, 연장, 휴일근무, 수정 요청을 공식 판정 데이터로 반영합니다.</td></tr>
+        <tr><td>4</td><td>실제 출퇴근 / 휴게 실적</td><td>기본 실적입니다. 하지만 승인 데이터와 유형 설정 없이 단독으로 최종 확정되지는 않습니다.</td></tr>
+        <tr><td>5</td><td>자동 규칙</td><td>휴게 자동 차감, 절사, 지각/조퇴 기준 같은 공통 규칙을 적용합니다.</td></tr>
+        <tr><td>6</td><td>관리자 보정 / 마감 확정</td><td>누락 타각, 충돌 케이스, 소급 수정 등 예외를 최종 확정합니다.</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="work-type-diff">표준/시차 근로제와 선택 근로제의 차이</h2>
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>표준 / 시차 근로제</h3>
+        <p>일 단위 예상 출퇴근 프레임이 비교적 명확합니다. 따라서 정상 출퇴근, 지각, 조퇴, 연장 인정 여부를 하루 단위로 직관적으로 판정할 수 있습니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>선택 근로제</h3>
+        <p>별도 분기로 처리되며, 주 단위 또는 월 단위 정산이 강조됩니다. 즉 예상 출퇴근 프레임은 존재하더라도, 최종 초과근무 판정은 정산기간 기준으로 재판정할 필요가 있습니다.</p>
+      </div>
+    </div>
+    <div class="note-box">
+      선택 근로제는 <code>예상 출퇴근 시간 수립</code>과 <code>정산기간 단위 초과근무 판정</code>이 모두 필요합니다. 따라서 일반근로제와 같은 일 단위 계산만으로 설명하면 빠지는 내용이 생깁니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="daily-steps">일별 판정 상세 단계</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>단계</th>
+          <th>설명</th>
+          <th>실무 포인트</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>0단계 대상 확정</td><td>마감 대상 월, 직원, 사업장, 조직을 확정합니다.</td><td>월중 입퇴사자와 겸직자, 조직 이동자를 함께 고려해야 합니다.</td></tr>
+        <tr><td>1단계 기준 자료 확정</td><td>캘린더, 근로제, 휴가유형, 출장유형, 정책값을 마감 기준 자료로 고정합니다.</td><td>마감 후 기준값이 바뀌더라도 기존 결과 설명이 가능해야 하므로 기준 자료 확정이 필요합니다.</td></tr>
+        <tr><td>2단계 정합성 체크</td><td>미승인 요청, 누락 타각, 미확정 스케줄, 미완료 보정 여부를 확인합니다.</td><td>이 단계는 마감 가능 여부를 결정하는 품질 게이트입니다.</td></tr>
+        <tr><td>3단계 기본 근무일 판정</td><td>근무일, 유급휴일, 무급휴무일, 대체휴일, 휴일을 판정합니다.</td><td>휴일 판정이 틀리면 이후 휴일근로 분류가 전부 흔들립니다.</td></tr>
+        <tr><td>4단계 소정근로 프레임 생성</td><td>근로제와 캘린더로 기본 소정근로 구간을 만듭니다.</td><td>이 단계는 "원래 어떻게 일하기로 되어 있었는가"를 정의합니다.</td></tr>
+        <tr><td>4-A단계 예상 출퇴근 수립</td><td>근무패턴을 반영해 예상 출근/퇴근 프레임을 직원별로 생성합니다.</td><td>독립 단계이며, 정상/이상 판정의 핵심 기준입니다.</td></tr>
+        <tr><td>5단계 원본 실적구간 생성</td><td>실제 출퇴근과 휴게 실적으로 기본 실적구간을 만듭니다.</td><td>타각은 기본 실적이지만 최종 인정근로시간과 동일하지는 않습니다.</td></tr>
+        <tr><td>6~8단계 승인/휴가/출장 반영</td><td>승인 완료된 요청과 휴가/출장 유형을 반영해 판정대상시간을 보정합니다.</td><td>출장유형의 출퇴근 인정, 근무 인정 시간, 휴게 인정 시간이 직접 개입합니다.</td></tr>
+        <tr><td>9단계 판정대상시간 생성</td><td>실적구간과 승인된 간주근무 구간을 합쳐 실제 판정대상시간을 만듭니다.</td><td>이 시점부터 단순 타각이 아닌 "회사가 인정할 후보 시간"이 됩니다.</td></tr>
+        <tr><td>10단계 휴게 차감</td><td>실휴게 또는 자동 휴게 규칙을 반영합니다.</td><td>간주근무의 휴게 인정 규칙도 함께 봐야 합니다.</td></tr>
+        <tr><td>11단계 인정근로시간 산출</td><td>판정대상시간에서 제외시간과 휴게시간을 차감해 일별 인정근로시간을 만듭니다.</td><td>관리자 확정 보정이 있다면 이 단계에서 최종 반영합니다.</td></tr>
+        <tr><td>12단계 시간 속성 분해</td><td>소정, 연장, 야간, 휴일 시간으로 분해합니다.</td><td>총 인정근로시간과 수당용 시간 속성을 반드시 분리합니다.</td></tr>
+        <tr><td>13단계 이상 판정</td><td>누락 타각, 지각, 조퇴, 승인 없는 초과근무 같은 상태를 생성합니다.</td><td>근태 이상은 별도 결과 상태로 관리됩니다.</td></tr>
+        <tr><td>13-A단계 기준데이터 분류</td><td>정상 출퇴근, 연장 인정, 근태 이상, 휴일 근무로 분류합니다.</td><td>월마감은 이 분류 데이터를 집계하는 구조로 설명하는 것이 가장 정확합니다.</td></tr>
+        <tr><td>14~17단계 주간 정산 / 월 집계 / 보정 / 확정</td><td>유연근무 정산, 월합계 계산, 관리자 검토, 확정 결과 저장을 수행합니다.</td><td>이후 급여는 원본이 아니라 확정 결과를 읽어야 합니다.</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="classification">집계마감 기준데이터 분류</h2>
+    <p>집계마감 기준데이터는 네 가지로 분류됩니다. 이 네 분류는 단순 요약이 아니라, 마감 직전 일별 결과를 어떻게 저장하고 검토할지를 보여주는 핵심 개념입니다.</p>
+    <div class="grid-4">
+      <div class="trigger-box t-green">
+        <h3>정상 출퇴근</h3>
+        <p>예상 출퇴근 프레임 안에서 정상적으로 근무가 수행된 일자입니다. 일별 기본 근태의 기준 그룹입니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>연장 인정</h3>
+        <p>소정근로를 초과했으며 정책상 인정 가능한 시간입니다. 승인 여부와 근로제 정책이 함께 반영됩니다.</p>
+      </div>
+      <div class="trigger-box t-red">
+        <h3>근태 이상</h3>
+        <p>누락 타각, 지각, 조퇴, 승인 없는 초과근무, 비교 프레임 불일치 등 운영 확인이 필요한 상태입니다.</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>휴일 근무</h3>
+        <p>휴일 판정일에 근무로 인정된 시간입니다. 출장/외근 유형에서 휴일 포함 여부도 함께 영향을 줍니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="daily-formula">일별 산식과 결과 컬럼</h2>
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>일별 기본 산식</h3>
+        <p><code>판정대상시간 = 실제 출퇴근 구간 + 승인된 간주근무 구간</code></p>
+        <p><code>인정근로시간 = 판정대상시간 - 휴게시간 - 제외시간 &plusmn; 관리자 확정보정</code></p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>일별 결과 컬럼</h3>
+        <p><code>인정근로시간</code>, <code>소정근로시간</code>, <code>연장근로시간</code>, <code>야간근로시간</code>, <code>휴일근로시간</code>, <code>유급휴가시간</code>, <code>무급휴가시간</code>, <code>근태이상여부</code>, <code>보정사유</code>, <code>근거문서번호</code>를 분리 저장하는 방향이 적합합니다.</p>
+      </div>
+    </div>
+    <div class="note-box">
+      야간은 총시간을 한 번 더 더하는 개념이 아니라, 이미 인정된 시간의 속성입니다. 따라서 <code>총 인정근로시간</code>과 <code>가산수당용 시간</code>을 분리 저장해야 급여 계산이 깔끔합니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="monthly-closing">월 집계와 급여 연동</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>설명</th>
+          <th>매뉴얼 포인트</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>월 집계 결과</td><td>월 총 인정근로시간, 월 소정근로시간, 월 연장&middot;야간&middot;휴일근로시간, 월 유급/무급휴가 시간을 집계합니다.</td><td>임금명세서와 급여 수당 계산에 바로 연결됩니다.</td></tr>
+        <tr><td>관리자 검토 및 보정</td><td>분류 결과를 보고 이상 상태나 예외 케이스를 마지막으로 정리합니다.</td><td>근태 요청 관리 화면과 함께 마감 직전 운영 작업이 수행됩니다.</td></tr>
+        <tr><td>확정 결과</td><td>월마감 완료 시 급여 이관용 확정 자료를 생성합니다.</td><td>급여는 원본 타각이 아니라 확정 결과를 읽어야 합니다.</td></tr>
+        <tr><td>재마감 절차</td><td>마감 후 수정이 필요하면 해제 후 재계산하고 다시 확정합니다.</td><td>소급 변경 정책을 별도로 운영해야 합니다.</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="checklist">마감 전 체크리스트</h2>
+    <ul>
+      <li>미승인 근태 요청이 남아 있지 않은지 확인합니다.</li>
+      <li>누락 타각과 근태 이상 상태가 정리되었는지 확인합니다.</li>
+      <li>근로제와 근무패턴, 캘린더 기준 자료가 생성 가능한지 확인합니다.</li>
+      <li>휴가유형, 출장유형 같은 유형 기준정보 변경이 과거 기간에 영향을 주는지 확인합니다.</li>
+      <li>선택근무제 대상자는 정산기간 단위 판정이 별도로 반영되었는지 확인합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="exceptions">예외 처리와 보정 로그</h2>
+    <div class="grid-2">
+      <div class="trigger-box t-coral">
+        <h3>자주 발생하는 예외</h3>
+        <p>승인 없는 연장, 누락 타각, 자정 넘김, 휴게 미입력, 출장인데 타각 없음, 휴가와 출퇴근 기록 동시 존재 같은 케이스가 대표적입니다.</p>
+      </div>
+      <div class="trigger-box t-cyan">
+        <h3>로그에 남겨야 할 항목</h3>
+        <p>적용 근로제, 예상 출퇴근 프레임, 실제 타각, 승인 문서번호, 유형 기준값, 관리자 보정자, 보정 사유를 남겨야 결과 설명과 감사가 가능합니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="implementation">현재 구조에서의 운영 기준</h2>
+    <p>현재 화면 구성상 <code>근로제</code>, <code>근무패턴</code>, <code>근태 요청</code>, <code>직원 근태</code>, <code>휴가유형</code>, <code>출장유형</code>, <code>출퇴근 인정 근로 시간 계산</code> 흐름이 모두 존재합니다. 따라서 현재 구조에서도 충분히 <code>일별 분류 데이터 생성 &rarr; 월 집계 &rarr; 관리자 검토 &rarr; 급여 반영 자료 확정</code> 구조로 운영 기준을 설명할 수 있습니다. 이 매뉴얼은 현재 화면 구성을 기준으로 설명하고 있으며, 세부 산식은 별도 계산계획 문서와 일치하게 유지합니다.</p>
+
+    <hr class="section-divider">
+
+    <h2 id="related">함께 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="근로제관리.html" target="_top">근로제 관리 &rarr;</a>
+      <a href="근태요청관리.html" target="_top">근태 요청 관리 &rarr;</a>
+      <a href="출장유형관리.html" target="_top">출장&middot;외근 유형 관리 &rarr;</a>
+      <a href="인정근로시간_우선순위_충돌규칙_보완안.html" target="_top">우선순위&middot;충돌규칙 보완안 &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Floating TOC -->
+  <button class="fab-toc" id="fabToc" title="목차 열기">&#9776;</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#principles">월마감 계산의 기본 원칙</a>
+    <a href="#flow">전체 흐름</a>
+    <a href="#input-priority">입력 원천과 우선순위</a>
+    <a href="#work-type-diff">근로제 차이</a>
+    <a href="#daily-steps">일별 판정 상세 단계</a>
+    <a href="#classification">기준데이터 분류</a>
+    <a href="#daily-formula">일별 산식과 결과 컬럼</a>
+    <a href="#monthly-closing">월 집계와 급여 연동</a>
+    <a href="#checklist">마감 전 체크리스트</a>
+    <a href="#exceptions">예외 처리와 보정 로그</a>
+    <a href="#implementation">현재 구조에서의 운영 기준</a>
+    <a href="#related">함께 보면 좋은 문서</a>
+  </div>
+
+  <script>
+    // iframe detection
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+
+    // Floating TOC toggle
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

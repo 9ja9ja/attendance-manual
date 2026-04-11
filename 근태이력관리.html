@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근태 이력 관리 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2129;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--blue:#58a6ff;--green:#3fb950;--orange:#d29922;--red:#f85149;--purple:#bc8cff;--teal:#39d9c1;--pink:#f778ba;--coral:#ea8a5e;--cyan:#56d4dd}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+    .standalone-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    .standalone-nav .back-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;cursor:pointer;transition:all .15s;font-family:inherit}
+    .standalone-nav .back-btn:hover{background:rgba(88,166,255,.15)}
+    .standalone-nav .page-title{font-size:.85rem;font-weight:600;color:var(--text2)}
+    .standalone-nav .page-badge{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(63,185,80,.12);color:var(--green)}
+    @media all{body.in-iframe .standalone-nav{display:none}}
+    .mfg-content{max-width:960px;margin:0 auto;padding:2.5rem 2rem 4rem}
+    .mfg-content h1{font-size:1.8rem;font-weight:700;margin-bottom:.5rem}
+    .mfg-content .subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+    .mfg-content h2{font-size:1.4rem;font-weight:700;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+    .mfg-content h3{font-size:1.15rem;font-weight:600;margin:1.5rem 0 .75rem}
+    .mfg-content p{margin-bottom:.75rem;color:var(--text);font-size:.92rem;line-height:1.7}
+    .mfg-content ul{margin:.5rem 0 1rem;padding-left:1.25rem;color:var(--text)}
+    .mfg-content li{font-size:.92rem;line-height:1.7;margin-bottom:.4rem}
+    .section-divider{border:none;height:2px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:3rem 0}
+    .toc{margin:1.5rem 0 2.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+    .toc-title{font-size:.85rem;font-weight:700;color:var(--text2);margin-bottom:.75rem}
+    .toc a{color:var(--blue);text-decoration:none;font-size:.88rem;display:block;padding:3px 0}
+    .toc a:hover{text-decoration:underline}
+    .fab-toc{position:fixed;bottom:2rem;right:2rem;z-index:999;width:48px;height:48px;border-radius:50%;background:var(--blue);border:2px solid rgba(88,166,255,.4);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+    .fab-toc:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(88,166,255,.4)}
+    .fab-toc.active{background:var(--bg3);border-color:var(--border)}
+    .float-toc{position:fixed;bottom:5.5rem;right:2rem;z-index:998;width:340px;max-height:70vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
+    .float-toc.show{display:block;animation:tocSlideIn .2s ease}
+    @keyframes tocSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .float-toc .toc-title{font-size:.82rem;font-weight:700;color:var(--text2);margin-bottom:.6rem}
+    .float-toc a{color:var(--blue);text-decoration:none;font-size:.82rem;display:block;padding:4px 0}
+    .float-toc a:hover{text-decoration:underline;color:#fff}
+    body.in-iframe .fab-toc{bottom:1.5rem;right:1.5rem}
+    body.in-iframe .float-toc{bottom:4.5rem;right:1.5rem}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+    .tag{padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);color:var(--blue)}
+    .nav-links{display:flex;gap:8px;flex-wrap:wrap;margin:1.5rem 0}
+    .nav-links a{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;font-size:.8rem;font-weight:500;color:var(--blue);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);text-decoration:none;transition:all .15s}
+    .nav-links a:hover{background:rgba(88,166,255,.15)}
+    .note-box{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--orange);margin:.75rem 0;line-height:1.7}
+    .important-box{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:var(--red);margin:.75rem 0;line-height:1.7}
+    .key-box{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--green);margin:.75rem 0;line-height:1.7}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+    .trigger-box{background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:8px;padding:1rem 1.25rem}
+    .trigger-box h3{font-size:1rem;font-weight:600;margin:0 0 .5rem;color:var(--text)}
+    .trigger-box p{font-size:.85rem;color:var(--text2);margin:0;line-height:1.7}
+    .trigger-box.t-green{border-left-color:var(--green)}.trigger-box.t-orange{border-left-color:var(--orange)}.trigger-box.t-purple{border-left-color:var(--purple)}.trigger-box.t-teal{border-left-color:var(--teal)}.trigger-box.t-red{border-left-color:var(--red)}.trigger-box.t-pink{border-left-color:var(--pink)}.trigger-box.t-coral{border-left-color:var(--coral)}.trigger-box.t-cyan{border-left-color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+    th{text-align:left;font-weight:600;font-size:.78rem;color:var(--text3);padding:8px 10px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    td{padding:10px 10px;border-bottom:1px solid rgba(48,54,61,.5);color:var(--text);line-height:1.7}
+    td strong{white-space:nowrap}
+    .field-spec td:first-child{white-space:nowrap;font-weight:600;color:var(--blue);width:180px}
+    .field-spec td:nth-child(2){color:var(--text2);font-size:.82rem}
+    @media(max-width:768px){.mfg-content{padding:1.5rem 1rem 3rem}.mfg-content h1{font-size:1.4rem}.grid-2,.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">&larr; 인덱스</a>
+    <span class="page-title">근태 이력 관리</span>
+    <span class="page-badge">Operation</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>근태 이력 관리</h1>
+    <p class="subtitle">근태 관리 서비스에서 발생한 모든 변경 이력을 기간·기능·메뉴·처리자·대상자 기준으로 조회하는 감사(Audit) 화면입니다. 근로제 배포, 수정 요청 처리, 출퇴근 변경, 휴가 부여·조정 등 모든 근태 관리 작업의 이력을 추적할 수 있습니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">경로: 근태관리 &gt; 근태 이력 관리</span>
+      <span class="tag">권한: 관리자</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#overview">화면 개요</a>
+      <a href="#search">검색 영역</a>
+      <a href="#cascade">계단식 필터 구조</a>
+      <a href="#result">조회 영역</a>
+      <a href="#scenario">이력 추적 활용 시나리오</a>
+      <a href="#related">연결 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="overview">화면 개요</h2>
+    <p>근태 이력 관리는 관리자 전용 조회 화면으로, 근태 관리 서비스에서 발생한 모든 변경 이력을 한곳에서 확인할 수 있습니다.</p>
+    <ul>
+      <li>수정/삭제 기능 없이 <strong>순수 이력 조회만</strong> 제공합니다.</li>
+      <li>감사(Audit) 대응 및 변경 추적 목적으로 사용합니다.</li>
+      <li>근로제 배포, 수정 요청 처리, 출퇴근 변경, 휴가 부여·조정 등 모든 근태 관리 작업의 이력이 자동으로 기록됩니다.</li>
+    </ul>
+    <div class="key-box">이 화면은 읽기 전용입니다. 이력 데이터를 직접 수정하거나 삭제할 수 없으며, 모든 변경 내역은 시스템에 의해 자동으로 기록됩니다.</div>
+
+    <hr class="section-divider">
+
+    <h2 id="search">검색 영역</h2>
+    <p>조회 조건을 조합하여 원하는 이력을 검색합니다.</p>
+    <table class="field-spec">
+      <tbody>
+        <tr>
+          <td>기간</td>
+          <td>
+            from(시스템일자 - 1개월) ~ to(시스템일자)가 기본값입니다. 달력 아이콘을 클릭하여 날짜를 선택할 수 있습니다.
+          </td>
+        </tr>
+        <tr>
+          <td>기능</td>
+          <td>
+            드롭다운 (전체 default). 근태 관리 기능별로 조회합니다. 선택한 기능의 하위 메뉴만 메뉴 드롭다운에 노출됩니다.
+          </td>
+        </tr>
+        <tr>
+          <td>메뉴</td>
+          <td>
+            드롭다운 (전체 default). 기능에서 선택한 항목의 하위 메뉴만 노출됩니다. 계단식(cascade) 필터로 동작합니다.
+          </td>
+        </tr>
+        <tr>
+          <td>구분</td>
+          <td>
+            드롭다운 (전체 default). 메뉴에서 선택한 항목의 하위 구분만 노출됩니다.
+          </td>
+        </tr>
+        <tr>
+          <td>처리자</td>
+          <td>
+            근태 처리를 수행한 관리자 이름을 검색합니다. 인풋 10자, 한글/영문 입력 가능합니다.<br>
+            ID 검색 시 20자, 영문/숫자/특수문자 입력 가능합니다.
+          </td>
+        </tr>
+        <tr>
+          <td>대상자</td>
+          <td>
+            처리 대상이 된 직원 이름을 검색합니다. 인풋 10자, 한글/영문 입력 가능합니다.<br>
+            ID 검색 시 20자, 영문/숫자/특수문자 입력 가능합니다.
+          </td>
+        </tr>
+        <tr>
+          <td>조회 버튼</td>
+          <td>
+            Enter 키 또는 클릭으로 검색을 실행합니다. 결과가 없으면 <strong>"조회된 데이터가 없습니다"</strong> 메시지가 표시됩니다.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="cascade">계단식 필터 구조</h2>
+    <p>기능, 메뉴, 구분은 상위 선택에 따라 하위 옵션이 자동으로 필터링되는 계단식(cascade) 구조입니다.</p>
+    <div class="grid-3">
+      <div class="trigger-box t-teal">
+        <h3>1단계: 기능</h3>
+        <p>최상위 분류를 선택합니다. 근무설정, 근태요청, 휴가관리, 근태결과 등 근태 관리 주요 기능 단위입니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>2단계: 메뉴</h3>
+        <p>선택한 기능의 하위 메뉴만 표시됩니다. 예: 기능 "근무설정" 선택 시 근로제 관리, 근무지 관리, 배포 등이 노출됩니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>3단계: 구분</h3>
+        <p>선택한 메뉴의 하위 구분만 표시됩니다. 예: 메뉴 "근로제 관리" 선택 시 등록, 수정, 삭제, 배포 등이 노출됩니다.</p>
+      </div>
+    </div>
+    <div class="note-box">상위 항목을 변경하면 하위 항목은 자동으로 "전체"로 초기화됩니다. 예시: 기능 "근무설정" &rarr; 메뉴 "근로제 관리 / 근무지 관리 / 배포" &rarr; 구분 "등록 / 수정 / 삭제 / 배포"</div>
+
+    <hr class="section-divider">
+
+    <h2 id="result">조회 영역</h2>
+    <p>검색 조건에 맞는 이력이 테이블 형태로 표시됩니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>일시</strong></td>
+          <td>처리 일시를 YYYY-MM-DD HH:MM:SS 형식으로 표시합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>처리자</strong></td>
+          <td>관리자 이름(사번) 형태로 표시합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>대상자</strong></td>
+          <td>처리 대상 직원 이름(사번) 형태로 표시합니다. N개 항목을 일괄 수정한 경우 "N개의 항목이 수정되었습니다" 형태로 요약됩니다.</td>
+        </tr>
+        <tr>
+          <td><strong>기능</strong></td>
+          <td>계단식 분류의 최상위 기능값입니다.</td>
+        </tr>
+        <tr>
+          <td><strong>메뉴</strong></td>
+          <td>계단식 분류의 중간 메뉴값입니다.</td>
+        </tr>
+        <tr>
+          <td><strong>구분</strong></td>
+          <td>계단식 분류의 하위 구분값입니다.</td>
+        </tr>
+        <tr>
+          <td><strong>처리 내용</strong></td>
+          <td>실제 변경 내용을 요약한 텍스트입니다. 변경 전·후 값이 포함될 수 있습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="scenario">이력 추적 활용 시나리오</h2>
+    <p>근태 이력 관리 화면은 다음과 같은 상황에서 활용할 수 있습니다.</p>
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>감사 대응</h3>
+        <p>"누가, 언제, 어떤 근태 데이터를 변경했는지" 추적합니다. 내부 감사 또는 외부 감사 시 변경 이력 증빙 자료로 활용할 수 있습니다.</p>
+      </div>
+      <div class="trigger-box t-coral">
+        <h3>오류 추적</h3>
+        <p>근태 계산 오류가 발생했을 때 원인이 되는 변경 이력을 파악합니다. 어떤 시점에 어떤 변경이 있었는지 역추적할 수 있습니다.</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>배포 이력</h3>
+        <p>특정 직원에 대한 근로제·근무지 배포 변경 이력을 확인합니다. 배포 시점과 적용 내역을 추적할 수 있습니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>수정 요청 처리 이력</h3>
+        <p>승인/거절 처리 내역과 사유를 확인합니다. 수정 요청에 대한 처리 과정을 시간순으로 추적할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="related">연결 문서</h2>
+    <div class="nav-links">
+      <a href="근태요청관리.html" target="_top">근태요청관리 &rarr;</a>
+      <a href="근로제근무지배포.html" target="_top">근로제 근무지 배포 &rarr;</a>
+      <a href="근태결과집계_마감.html" target="_top">근태결과집계 마감 &rarr;</a>
+      <a href="근태관리_개요.html" target="_top">근태관리 개요 &rarr;</a>
+    </div>
+  </div>
+
+  <button class="fab-toc" id="fabToc" title="목차 열기">&#9776;</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#overview">화면 개요</a>
+    <a href="#search">검색 영역</a>
+    <a href="#cascade">계단식 필터 구조</a>
+    <a href="#result">조회 영역</a>
+    <a href="#scenario">이력 추적 활용 시나리오</a>
+    <a href="#related">연결 문서</a>
+  </div>
+
+  <script>
+    if(window.self!==window.top)document.body.classList.add('in-iframe');
+    const fab=document.getElementById('fabToc'),ftoc=document.getElementById('floatToc');
+    fab.addEventListener('click',()=>{const o=ftoc.classList.toggle('show');fab.classList.toggle('active',o)});
+    document.addEventListener('click',e=>{if(!fab.contains(e.target)&&!ftoc.contains(e.target)){ftoc.classList.remove('show');fab.classList.remove('active')}});
+  </script>
+</body>
+</html>

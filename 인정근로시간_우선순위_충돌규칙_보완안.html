@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인정근로시간 우선순위·충돌규칙 보완안 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --blue: #58a6ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+      --teal: #39d9c1;
+      --pink: #f778ba;
+      --coral: #ea8a5e;
+      --cyan: #56d4dd;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .standalone-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .standalone-nav .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .standalone-nav .back-btn:hover { background: rgba(88,166,255,0.15); }
+    .standalone-nav .page-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .standalone-nav .page-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(63,185,80,0.12);
+      color: var(--green);
+    }
+    @media all { body.in-iframe .standalone-nav { display: none; } }
+
+    .mfg-content {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+    .mfg-content h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .mfg-content .subtitle {
+      color: var(--text2);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .mfg-content h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .mfg-content h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.4rem 0 0.75rem;
+    }
+    .mfg-content p {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.75;
+    }
+    .mfg-content ul {
+      margin: 0.5rem 0 1rem;
+      padding-left: 1.25rem;
+    }
+    .mfg-content li {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+    .section-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 3rem 0;
+    }
+    .toc {
+      margin: 1.5rem 0 2.5rem;
+      padding: 1.25rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .toc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 0.75rem;
+    }
+    .toc a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.88rem;
+      display: block;
+      padding: 3px 0;
+    }
+    .toc a:hover { text-decoration: underline; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+    .tag {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      color: var(--blue);
+    }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.5rem 0; }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: rgba(88,166,255,0.15); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .trigger-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .trigger-box h3 {
+      font-size: 1rem;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .trigger-box p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin: 0;
+    }
+    .trigger-box.t-green { border-left-color: var(--green); }
+    .trigger-box.t-orange { border-left-color: var(--orange); }
+    .trigger-box.t-purple { border-left-color: var(--purple); }
+    .trigger-box.t-red { border-left-color: var(--red); }
+    .trigger-box.t-teal { border-left-color: var(--teal); }
+    .trigger-box.t-coral { border-left-color: var(--coral); }
+    .note-box, .key-box, .important-box, .diff-box {
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.84rem;
+      margin: 0.9rem 0;
+      line-height: 1.75;
+    }
+    .note-box {
+      background: rgba(210,153,34,0.08);
+      border: 1px solid rgba(210,153,34,0.2);
+      color: var(--orange);
+    }
+    .key-box {
+      background: rgba(63,185,80,0.08);
+      border: 1px solid rgba(63,185,80,0.2);
+      color: var(--green);
+    }
+    .important-box {
+      background: rgba(248,81,73,0.08);
+      border: 1px solid rgba(248,81,73,0.2);
+      color: var(--red);
+    }
+    .diff-box {
+      background: rgba(188,140,255,0.08);
+      border: 1px solid rgba(188,140,255,0.2);
+      color: var(--purple);
+    }
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flow-step strong {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--blue);
+      margin-bottom: 0.45rem;
+    }
+    .flow-step p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text3);
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--text);
+      line-height: 1.7;
+      vertical-align: top;
+    }
+    code {
+      color: var(--blue);
+      font-family: Consolas, monospace;
+      font-size: 0.88rem;
+    }
+    .fab-toc {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 999;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--blue);
+      border: 2px solid rgba(88,166,255,0.4);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .fab-toc.active { background: var(--bg3); border-color: var(--border); }
+    .float-toc {
+      position: fixed;
+      bottom: 5.5rem;
+      right: 2rem;
+      z-index: 998;
+      width: 340px;
+      max-height: 70vh;
+      overflow-y: auto;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .float-toc.show { display: block; }
+    .float-toc .toc-title { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 0.6rem; }
+    .float-toc a { color: var(--blue); text-decoration: none; font-size: 0.82rem; display: block; padding: 4px 0; }
+    .float-toc a:hover { text-decoration: underline; color: #fff; }
+    body.in-iframe .fab-toc { bottom: 1.5rem; right: 1.5rem; }
+    body.in-iframe .float-toc { bottom: 4.5rem; right: 1.5rem; }
+    @media (max-width: 1024px) {
+      .flow-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .mfg-content { padding: 1.5rem 1rem 3rem; }
+      .mfg-content h1 { font-size: 1.4rem; }
+      .grid-2, .grid-3, .flow-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">&larr; 인덱스</a>
+    <span class="page-title">인정근로시간 우선순위·충돌규칙 보완안</span>
+    <span class="page-badge">Priority &amp; Conflict</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>인정근로시간은 입력원천의 우선순위와 충돌 규칙까지 정의해야 완성됩니다</h1>
+    <p class="subtitle">이 문서는 기존 <code>인정근로시간·월마감</code> 및 <code>인정근로시간 통합 안내</code> 문서를 보완하기 위한 상세 매뉴얼입니다. 기존 문서가 잘 잡아놓은 전체 흐름은 유지하되, 실제 시스템 계산에서 가장 중요한 <strong>입력원천 우선순위</strong>, <strong>충돌 시 처리 원칙</strong>, <strong>원시실적과 승인데이터의 관계</strong>, <strong>무엇을 대체하고 무엇을 보완하는지</strong>를 더 구체적으로 정리합니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">보완 대상: 인정근로시간·월마감 / 인정근로시간 통합 안내</span>
+      <span class="tag">핵심 주제: 우선순위 / 충돌규칙 / 대체·보완·교정·확정</span>
+      <span class="tag">작성 관점: 근로기준법 검토 + ERP 근태 운영</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#priority-practical">실무 판정 우선순위</a>
+      <a href="#scenarios">대표 충돌 시나리오</a>
+      <a href="#status">상태값 체계와 자동확정 기준</a>
+      <a href="#summary">문서 목적과 요약</a>
+      <a href="#good">기존 문서의 강점</a>
+      <a href="#issues">기존 문서에서 보완이 필요한 부분</a>
+      <a href="#changes">원래 문서 대비 무엇이 바뀌어야 하는가</a>
+      <a href="#model">권장 계산모델</a>
+      <a href="#priority">입력원천 우선순위</a>
+      <a href="#actions">입력원천이 갖는 역할 구분</a>
+      <a href="#conflicts">충돌 규칙 상세</a>
+      <a href="#order">권장 일별 계산 순서</a>
+      <a href="#tables">권장 결과 테이블 구조</a>
+      <a href="#law">법령 관점 확인 포인트</a>
+      <a href="#apply-docs">기존 문서에 반영할 문구 방향</a>
+      <a href="#related">함께 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="priority-practical">실무 판정 우선순위</h2>
+    <p>실무적으로 바로 적용하기 좋은 판정 순서는 아래와 같습니다. 핵심은 무조건 타각 우선도 아니고, 무조건 기안 우선도 아니라는 점입니다. 먼저 그날의 근로의무와 날짜 성격을 정하고, 그 다음 승인된 기안으로 근로의무 면제 또는 간주근무를 반영한 뒤, 실제 타각으로 충돌 여부와 실제 근로 흔적을 확인하는 방식이 가장 안정적입니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>실무 순위</th>
+          <th>입력원천</th>
+          <th>주요 역할</th>
+          <th>운영 원칙</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>근무패턴 / 회사 캘린더 / 개인 스케줄</td>
+          <td>소정근로일 여부, 휴일 여부, 소정시간, 휴게 배치, 예상 프레임 결정</td>
+          <td>이 기준이 없으면 연차, 지각, 휴일근로, 결근을 판정할 수 없습니다.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>승인 완료된 근태기안</td>
+          <td>연차, 반차, 시간연차, 출장, 외근, 재택, 휴일근무, 연장근무, 대체휴무 반영</td>
+          <td>근로의무 면제 또는 간주근무 성격의 기안은 원칙적으로 타각보다 먼저 해석합니다.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>타각기록</td>
+          <td>실제 출근/퇴근, 외출/복귀, 모바일/GPS/PC 기록 등 실제 근무 흔적 확인</td>
+          <td>최상위 원천은 아니지만, 충돌 탐지와 실제 근로 제공 확인에 가장 중요합니다.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>자동 규칙</td>
+          <td>휴게 자동 차감, 지각/조퇴 기준, 절사 규칙, 연차 시간 환산 적용</td>
+          <td>앞단 데이터를 해석하는 보조 규칙이지, 앞단 원천을 새로 만들지는 않습니다.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>관리자 보정</td>
+          <td>오타각 정정, 출장 미타각 보정, 연차 취소/변경, 근로 제공 사실 확정</td>
+          <td>충돌, 오류, 미확정 상태를 최종 확정하는 단계입니다.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>마감 확정값</td>
+          <td>급여와 정산으로 넘길 최종 결과 유지</td>
+          <td>재마감 전에는 변하지 않는 최종 결과로 관리합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="key-box">
+      정리하면 <strong>근무패턴·캘린더 &gt; 승인 완료된 근태기안 &gt; 타각기록 &gt; 자동 규칙 &gt; 관리자 보정 &gt; 마감 확정</strong> 순으로 보는 것이 가장 실무적입니다.
+    </div>
+    <div class="note-box">
+      특히 연차·반차·공가처럼 <strong>근로의무 면제</strong> 성격의 기안과, 출장·외근·재택처럼 <strong>근무 간주 또는 보완</strong> 성격의 기안은 같은 승인 데이터라도 처리 방식이 다릅니다. 전자는 시간을 비근로 상태로 대체하고, 후자는 실제 부족분을 보완하거나 근무로 간주합니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="scenarios">대표 충돌 시나리오</h2>
+    <p>아래 시나리오는 실제 ERP 규칙으로 바로 옮겨 쓰기 좋은 대표 케이스입니다. 충돌이 발생하는 순간 무리하게 자동확정하지 않고, 무엇이 정상이고 무엇이 경고, 충돌, 오류, 미확정인지 먼저 나누는 것이 중요합니다.</p>
+    <div class="note-box">
+      여기서 말하는 <strong>짧은 타각</strong>과 <strong>장시간 타각</strong>은 회사 규정으로 기준을 두는 것이 좋습니다. 예를 들어 <strong>30분 미만 체류는 경고</strong>, <strong>30분 이상 체류는 충돌</strong>처럼 두면 운영 기준을 만들기 쉽습니다. 다만 이 기준은 업종과 출퇴근 운영방식에 따라 조정할 수 있어야 합니다.
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>시나리오</th>
+          <th>1차 자동처리</th>
+          <th>최종 원칙</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>종일 연차 승인 + 타각 없음</strong></td>
+          <td>연차 확정</td>
+          <td>정상입니다. 결근이 아니라 연차 사용으로 보고 소정근로시간만큼 차감합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>종일 연차 승인 + 짧은 타각</strong></td>
+          <td>연차 유지 + 경고</td>
+          <td>오타각 또는 잠시 방문 가능성이 있으므로 경고만 남기고 연차를 유지할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td><strong>종일 연차 승인 + 장시간 타각</strong></td>
+          <td>충돌 상태</td>
+          <td>연차 취소 누락, 오타각, 실제 근로 제공 중 무엇인지 관리자 확인이 필요합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>반차 승인 + 반차 시간대 타각 없음</strong></td>
+          <td>반차 확정</td>
+          <td>정상입니다. 반차 시간은 비근로 시간대로 대체하고 나머지 시간만 근무 판정합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>반차 승인 + 반차 시간대 근무 타각</strong></td>
+          <td>충돌 상태</td>
+          <td>반차 취소, 시간단위 휴가 전환, 실제 근무 인정 중 하나로 정리해야 합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>정상근무일 + 타각 없음 + 기안 없음</strong></td>
+          <td>미확정</td>
+          <td>즉시 결근 확정하지 말고 마감 전까지 보정 대기 후, 미보정이면 결근으로 확정합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>출장 승인 + 타각 없음</strong></td>
+          <td>출장근무 인정</td>
+          <td>정상입니다. 소정근로시간 인정 또는 출장근무 규칙을 적용합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>휴일 + 타각 + 휴일근무 승인 없음</strong></td>
+          <td>충돌 상태</td>
+          <td>단순 체류인지, 실제 지시 근무인지, 승인 누락인지 확인한 뒤 반영합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>휴무일 + 연차 승인</strong></td>
+          <td>오류</td>
+          <td>원래 근로의무가 없는 날에는 연차 차감이 성립하지 않으므로 오류로 처리하는 편이 안전합니다.</td>
+        </tr>
+        <tr>
+          <td><strong>연차 시간대와 연장근무 시간대 중복</strong></td>
+          <td>오류</td>
+          <td>시간대 중복은 자동으로 성립시키지 말고, 기안 변경 또는 시간대 재조정이 필요합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="important-box">
+      특히 <strong>종일 연차 + 실제 타각</strong>, <strong>반차 + 반차 시간대 타각</strong>, <strong>휴일 + 장시간 타각</strong>은 자동확정하면 안 되는 대표 사례입니다. 실제 근로 제공이 있었을 가능성이 크기 때문입니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="status">상태값 체계와 자동확정 기준</h2>
+    <p>충돌 규칙을 운영에 연결하려면 단순히 이상 여부만 두기보다, 상태값 체계를 명확히 가져가는 것이 좋습니다. 아래 체계는 월마감 전 정리 대상과 급여 반영 가능 여부를 분명하게 나누는 데 유용합니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>상태값</th>
+          <th>의미</th>
+          <th>마감 가능 여부</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>정상</strong></td>
+          <td>승인기안과 타각이 모순되지 않고 자동확정 가능한 상태</td>
+          <td>가능</td>
+        </tr>
+        <tr>
+          <td><strong>경고</strong></td>
+          <td>운영상 확인은 필요하지만 자동확정은 가능한 상태</td>
+          <td>가능</td>
+        </tr>
+        <tr>
+          <td><strong>충돌</strong></td>
+          <td>둘 이상의 원천이 동시에 성립해 자동으로 결정할 수 없는 상태</td>
+          <td>불가</td>
+        </tr>
+        <tr>
+          <td><strong>오류</strong></td>
+          <td>원칙적으로 동시에 성립하면 안 되는 조합이 발생한 상태</td>
+          <td>불가</td>
+        </tr>
+        <tr>
+          <td><strong>미확정</strong></td>
+          <td>증빙이나 보정이 아직 부족해 결론을 내리지 못한 상태</td>
+          <td>불가</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="grid-2">
+      <div class="trigger-box t-green">
+        <h3>자동확정 가능한 것</h3>
+        <ul>
+          <li>승인기안과 타각이 모순되지 않는 경우</li>
+          <li>종일 연차 + 무타각</li>
+          <li>출장 승인 + 무타각</li>
+          <li>반차 + 타각이 반차 외 시간대에만 존재하는 경우</li>
+        </ul>
+      </div>
+      <div class="trigger-box t-red">
+        <h3>자동확정하면 안 되는 것</h3>
+        <ul>
+          <li>연차/반차 시간대와 타각이 겹치는 경우</li>
+          <li>휴일인데 장시간 타각이 있는 경우</li>
+          <li>휴가기안과 출장기안이 같은 시간대에 겹치는 경우</li>
+          <li>휴무일에 연차 차감이 발생하는 경우</li>
+        </ul>
+      </div>
+    </div>
+    <div class="key-box">
+      운영 원칙은 <strong>정상 / 경고</strong>만 자동확정하고, <strong>충돌 / 오류 / 미확정</strong>은 관리자 보정 이력 없이는 월마감과 급여 반영이 불가능하도록 막는 방식이 가장 실무적입니다.
+    </div>
+
+    <h2 id="summary">문서 목적과 요약</h2>
+    <div class="key-box">
+      기존 문서는 <strong>기준정보 → 실적수집 → 승인반영 → 일별판정 → 월마감확정 → 급여반영</strong>이라는 큰 흐름을 잘 잡고 있습니다. 다만 실제 계산규칙으로 내리려면, 각 입력원천이 <strong>비교 기준인지</strong>, <strong>대체값인지</strong>, <strong>보완값인지</strong>, <strong>교정값인지</strong>, <strong>최종확정값인지</strong>까지 나누어야 합니다.
+    </div>
+    <p>즉, 지금 필요한 보완은 흐름 자체를 뒤집는 것이 아닙니다. 오히려 기존 흐름을 유지하면서도 각 단계가 무엇을 하는지 더 엄격하게 정의하는 것입니다. 특히 <code>판정대상시간 = 실제 타각 + 승인 간주근무</code> 같은 표현은 방향은 맞지만, 그대로 쓰면 중복 산입이나 충돌 오판정이 생길 수 있습니다.</p>
+
+    <hr class="section-divider">
+
+    <h2 id="good">기존 문서의 강점</h2>
+    <div class="grid-3">
+      <div class="trigger-box">
+        <h3>예상 프레임을 먼저 만든다</h3>
+        <p>근로제와 근무패턴을 먼저 보고, 그 다음 실제 출퇴근을 비교한다는 구조가 분명합니다. 이 방향은 근태 시스템 설계에서 매우 안정적입니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>일별 분류 후 월마감</h3>
+        <p>하루하루를 먼저 정상, 연장, 이상, 휴일로 분류하고 그 결과를 월마감에서 확정한다는 구조가 일관됩니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>가산시간 분리 인식</h3>
+        <p>총 인정근로시간과 연장·야간·휴일 시간을 분리해 관리해야 한다는 점을 이미 잘 짚고 있습니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="issues">기존 문서에서 보완이 필요한 부분</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>보완 필요 항목</th>
+          <th>현재 상태</th>
+          <th>왜 문제인지</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>입력원천 우선순위</td>
+          <td>두 문서에 표현은 있으나 순서와 의미가 완전히 같지는 않습니다.</td>
+          <td>기획서와 구현기준이 달라질 수 있고, 테스트 케이스 정의도 흔들릴 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>실적과 승인데이터의 관계</td>
+          <td>승인 완료 데이터가 중요하다고 설명하지만, 실제 실적을 덮는지 보완하는지까지는 구분이 약합니다.</td>
+          <td>휴가 + 실제 타각, 출장 자동인정 + 실제 타각 같은 케이스에서 중복 계산이 생길 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>정정 승인과 원시타각 관계</td>
+          <td>수정 요청이 반영된다는 설명은 있지만, 원시값을 교체하는지 누적하는지 명시가 부족합니다.</td>
+          <td>정정 데이터가 보정인지 누적인지 불분명하면 최종 시각이 흔들립니다.</td>
+        </tr>
+        <tr>
+          <td>법정 시간과 회사 승인시간의 분리</td>
+          <td>연장 인정, 승인 없는 연장, 급여 반영이 같은 그룹 안에서 보이는 표현이 있습니다.</td>
+          <td>법정 근로시간 발생과 회사 승인 여부는 다른 층위인데, 이를 분리하지 않으면 법령 설명이 약해집니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="changes">원래 문서 대비 무엇이 바뀌어야 하는가</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>기존 문서 표현</th>
+          <th>보완 후 권장 표현</th>
+          <th>변경 이유</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>승인 완료된 요청을 공식 판정 데이터로 반영</td>
+          <td>승인 완료된 요청은 실적을 대체하거나 보완하거나 교정하는 거래데이터로 반영</td>
+          <td>승인 데이터의 역할이 모두 같지 않기 때문입니다.</td>
+        </tr>
+        <tr>
+          <td>판정대상시간 = 실제 출퇴근 구간 + 승인된 간주근무 구간</td>
+          <td>교정실적구간 + 보완근무구간 - 비근로대체구간</td>
+          <td>단순 합산으로 표현하면 이중 산입 위험이 큽니다.</td>
+        </tr>
+        <tr>
+          <td>승인 없는 연장 = 이상 상태</td>
+          <td>승인 없는 연장은 운영상 이상 상태이되, 법정 발생시간과 회사 승인시간은 분리 관리</td>
+          <td>내부 승인 규칙과 법정 시간 발생은 같은 개념이 아닙니다.</td>
+        </tr>
+        <tr>
+          <td>휴가/출장 반영</td>
+          <td>휴가는 근무의무 대체, 출장은 부족구간 보완 또는 간주근무 생성</td>
+          <td>휴가와 출장은 데이터 성격이 다르므로 같은 레벨로만 처리하면 안 됩니다.</td>
+        </tr>
+        <tr>
+          <td>관리자 보정 반영</td>
+          <td>관리자 보정은 최후수단이며, 반드시 보정사유와 근거문서를 남김</td>
+          <td>마감 후 결과 설명과 감사 대응을 위해 보정 이력이 필수입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="diff-box">
+      기존 두 문서는 "흐름"을 설명하는 문서로는 충분히 좋습니다. 이번 보완 문서는 여기에 <strong>계산의 질서</strong>를 더하는 문서라고 보면 됩니다. 즉, 어떤 데이터가 먼저인지보다 더 중요한 것은 <strong>그 데이터가 무엇을 바꾸는 데이터인지</strong>입니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="model">권장 계산모델</h2>
+    <p>인정근로시간은 한 줄 산식으로 끝나는 개념이 아니라, 여러 층을 거쳐 만들어지는 결과값입니다. 가장 안전한 구조는 아래 5개 레이어를 나누는 방식입니다.</p>
+    <div class="flow-row">
+      <div class="flow-step">
+        <strong>1. 기준정보</strong>
+        <p>근로제, 캘린더, 근무패턴, 휴가유형, 출장유형</p>
+      </div>
+      <div class="flow-step">
+        <strong>2. 원시실적</strong>
+        <p>원시 출근/퇴근, 외출/복귀, 실제 휴게</p>
+      </div>
+      <div class="flow-step">
+        <strong>3. 승인거래</strong>
+        <p>휴가 승인, 출장 승인, 출퇴근 정정 승인, 연장 승인</p>
+      </div>
+      <div class="flow-step">
+        <strong>4. 자동규칙</strong>
+        <p>자동 휴게, 절사, 자정 넘김 분리, 지각/조퇴 기준</p>
+      </div>
+      <div class="flow-step">
+        <strong>5. 관리자확정</strong>
+        <p>보정, 소급정정, 월마감 확정, 재마감</p>
+      </div>
+      <div class="flow-step">
+        <strong>6. 급여반영</strong>
+        <p>확정 결과를 급여 기준자료로 이관</p>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <p><code>교정실적구간 = 원시실적구간 + 승인된 출퇴근정정 반영</code></p>
+      <p><code>근무의무구간 = 근로제 + 캘린더 + 근무패턴 기준 구간</code></p>
+      <p><code>상태대체구간 = 승인된 휴가/휴무 등으로 근무의무를 대체하는 구간</code></p>
+      <p><code>보완근무구간 = 출장/외근 간주근무 등으로 실제 부족분을 채우는 구간</code></p>
+      <p><code>판정대상시간 = 교정실적구간 + 보완근무구간 - 비근로대체구간</code></p>
+      <p><code>인정근로시간 = 판정대상시간 - 휴게시간 - 제외시간 ± 관리자보정</code></p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="priority">입력원천 우선순위</h2>
+    <div class="note-box">
+      이 섹션은 <strong>엔진 내부에서 입력원천을 어떤 성격으로 다룰지</strong>를 설명하는 표입니다. 앞에서 정리한 <strong>실무 판정 우선순위</strong>가 운영자가 날짜 성격과 승인 여부를 어떤 순서로 판단할지 보여주는 표라면, 아래 표는 각 데이터가 <strong>기준</strong>, <strong>사실</strong>, <strong>대체</strong>, <strong>보완</strong>, <strong>교정</strong>, <strong>확정</strong> 중 무엇으로 작동하는지 설명하는 내부 구조 안내입니다.
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>우선순위</th>
+          <th>입력원천</th>
+          <th>역할</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>개인별 근로제 / 캘린더 / 근무패턴</td>
+          <td>근무일 여부, 휴일 여부, 소정근로시간, 예상 프레임을 결정하는 기준값</td>
+          <td>이 단계는 실적을 대체하지 않고, 판정 기준을 만듭니다.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>원시 출퇴근 / 외출 / 실제 휴게</td>
+          <td>사실 데이터</td>
+          <td>이 단계는 존재한 사실을 저장합니다. 아직 인정 여부는 확정하지 않습니다.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>승인된 출퇴근 수정 / 근로제 변경 / 휴가 / 출장 / 연장 요청</td>
+          <td>원시실적을 교정하거나, 근무의무를 대체하거나, 부족구간을 보완하는 거래 데이터</td>
+          <td>모든 승인 데이터가 동일한 방식으로 작동하지 않으므로 역할 구분이 필요합니다.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>자동 규칙</td>
+          <td>앞 단계 결과를 해석하는 계산 보조 규칙</td>
+          <td>자동규칙은 원시실적과 승인을 뒤엎기보다 해석하는 성격이어야 합니다.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>관리자 보정 / 월마감 확정</td>
+          <td>예외와 충돌을 최종 확정하는 단계</td>
+          <td>반드시 로그와 근거문서가 있어야 합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="important-box">
+      여기서 중요한 것은 <strong>우선순위가 높으면 무조건 덮어쓴다</strong>가 아니라, 각 원천이 <strong>무엇을 담당하는 데이터인지</strong>를 먼저 나누는 것입니다. 근무패턴은 비교 기준이고, 휴가는 상태 대체이며, 출퇴근 수정 승인은 원시값 교정입니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="actions">입력원천이 갖는 역할 구분</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>설명</th>
+          <th>대표 예시</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>기준</td>
+          <td>정상/이상/휴일 판정의 비교 프레임이 되는 데이터</td>
+          <td>근로제, 캘린더, 근무패턴, 예상 출퇴근 프레임</td>
+        </tr>
+        <tr>
+          <td>사실</td>
+          <td>실제로 발생한 근무 흔적을 담는 데이터</td>
+          <td>원시 타각, 외출/복귀, 실제 휴게</td>
+        </tr>
+        <tr>
+          <td>대체</td>
+          <td>원래 근무해야 할 시간을 다른 상태로 바꾸는 데이터</td>
+          <td>전일 휴가, 반차, 무급휴무, 휴직</td>
+        </tr>
+        <tr>
+          <td>보완</td>
+          <td>실제 실적이 부족하거나 산정이 어려울 때 일부 구간을 채우는 데이터</td>
+          <td>출장 자동인정, 외근 간주근무</td>
+        </tr>
+        <tr>
+          <td>교정</td>
+          <td>원시값을 정정하여 최종 기준값으로 바꾸는 데이터</td>
+          <td>출근/퇴근 수정 승인</td>
+        </tr>
+        <tr>
+          <td>확정</td>
+          <td>예외 판단을 끝내고 결과를 굳히는 데이터</td>
+          <td>관리자 보정, 월마감 확정</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="conflicts">충돌 규칙 상세</h2>
+    <p>아래 규칙은 실제 구현과 테스트케이스를 만들 때 바로 사용할 수 있는 수준으로 정리한 권장안입니다.</p>
+
+    <h3>1. 근로제/캘린더 vs 실제 타각</h3>
+    <p>근로제와 캘린더는 해당 날짜가 근무일인지, 휴일인지, 소정근로시간이 얼마인지를 정합니다. 실제 타각은 근무의 흔적일 뿐이므로, 타각만으로 휴일이 평일로 바뀌지는 않습니다. 따라서 <strong>날짜 성격은 기준정보가 먼저 결정하고, 타각은 그 위에서 근무 발생 여부를 판단</strong>해야 합니다.</p>
+
+    <h3>2. 근무패턴/예상 프레임 vs 실제 타각</h3>
+    <p>예상 프레임은 <strong>대체값이 아니라 비교 기준</strong>입니다. 실제 타각이 예상보다 늦으면 지각 또는 예외, 빠르면 조퇴 또는 예외, 길면 연장 또는 초과근무 후보로 분류합니다. 예상 프레임과 다르다고 바로 버리는 구조는 피해야 합니다.</p>
+
+    <h3>3. 휴가 승인 vs 실제 타각</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th>권장 처리</th>
+          <th>설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>전일 휴가 승인 + 전일 실제 근무 타각</td>
+          <td>충돌건으로 분리</td>
+          <td>휴가 상태와 실제 근무가 동시에 존재하므로 자동합산하지 말고 관리자 확인 대상로 보냅니다.</td>
+        </tr>
+        <tr>
+          <td>오전 반차 승인 + 오후 실제 근무</td>
+          <td>휴가 시간대는 비근로 대체, 나머지 시간대만 근무판정</td>
+          <td>반차/시간차는 부분 대체 규칙으로 봐야 합니다.</td>
+        </tr>
+        <tr>
+          <td>시간차 승인 + 전체 타각 존재</td>
+          <td>승인 시간대를 근무의무 대체구간으로 우선 반영</td>
+          <td>실제 체류가 있어도 승인 휴가시간은 먼저 비근로상태로 전환해야 합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>4. 출장/외근 자동인정 vs 실제 타각</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th>권장 처리</th>
+          <th>설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>실제 타각 없음</td>
+          <td>승인된 출장유형의 간주근무 사용</td>
+          <td>이 경우 출장유형이 부족 구간을 채우는 보완값으로 작동합니다.</td>
+        </tr>
+        <tr>
+          <td>실제 타각 일부 존재</td>
+          <td>실제 타각 우선 + 부족 구간만 간주근무 보완</td>
+          <td>실제 있는 구간과 자동인정 구간을 모두 더하지 않도록 주의해야 합니다.</td>
+        </tr>
+        <tr>
+          <td>실제 타각 충분히 존재</td>
+          <td>실제 타각 우선, 출장은 상태·사유 중심 유지</td>
+          <td>자동인정 시간을 다시 더하면 이중 산입 위험이 큽니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5. 출퇴근 수정 승인 vs 원시 타각</h3>
+    <p>출퇴근 수정 승인은 원시 타각을 <strong>교정</strong>하는 데이터입니다. 즉 <code>원시 타각 + 수정 타각</code>이 아니라, <code>정정 후 기준 타각</code>을 따로 만들어야 합니다. 저장 구조도 <code>raw_clock_in/out</code>과 <code>corrected_clock_in/out</code>를 분리하는 방식이 가장 안전합니다.</p>
+
+    <h3>6. 연장근무 승인 vs 실제 초과근무</h3>
+    <div class="important-box">
+      연장 승인 자체가 근로시간을 생성하면 안 됩니다. 연장 승인은 회사가 초과근무를 어떻게 인정할지의 기준이고, 실제 시간은 타각 또는 별도 증빙에서 와야 합니다.
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>관리 항목</th>
+          <th>설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>법정 발생시간</td>
+          <td>실제 초과근무 기준</td>
+          <td>실제 근무가 있었는지에 따라 발생하는 시간입니다.</td>
+        </tr>
+        <tr>
+          <td>회사 승인시간</td>
+          <td>승인된 초과근무 기준</td>
+          <td>내부 승인 정책상 인정된 시간입니다.</td>
+        </tr>
+        <tr>
+          <td>급여 반영시간</td>
+          <td>정산·보상 기준</td>
+          <td>정책에 따라 법정 발생시간과 같을 수도, 회사 승인시간과 같을 수도 있습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>7. 실제 휴게 vs 자동 휴게</h3>
+    <p>실제 휴게 입력이 있으면 실제 휴게를 우선 사용하고, 실제 휴게가 없을 때만 규정 휴게를 보조적으로 적용하는 구조가 좋습니다. 출장·외근 간주휴게는 다시 그보다 뒤에 와야 하며, 세 가지 휴게를 동시에 누적하지 않도록 해야 합니다.</p>
+
+    <h3>8. 관리자 보정 vs 앞단 데이터</h3>
+    <p>관리자 보정은 최후 수단입니다. 앞단 데이터를 무시할 수는 있지만, 반드시 <strong>보정사유, 보정자, 보정시각, 근거문서, 원래값, 변경값</strong>을 남겨야 합니다. 또한 월마감 후 보정은 재마감 절차와 연결되어야 합니다.</p>
+
+    <hr class="section-divider">
+
+    <h2 id="order">권장 일별 계산 순서</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>순서</th>
+          <th>계산 단계</th>
+          <th>핵심 판단</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>캘린더/근로제로 근무일·휴일 판정</td><td>그날이 원래 어떤 날이었는지 확정</td></tr>
+        <tr><td>2</td><td>근무패턴으로 예상 프레임 생성</td><td>정상/지각/조퇴 비교 기준 생성</td></tr>
+        <tr><td>3</td><td>원시 타각/외출/휴게 정규화</td><td>있는 그대로의 사실 데이터 정리</td></tr>
+        <tr><td>4</td><td>출퇴근 수정 승인 반영</td><td>원시값을 교정된 기준값으로 전환</td></tr>
+        <tr><td>5</td><td>휴가 승인 반영</td><td>근무의무구간을 휴가 상태로 대체</td></tr>
+        <tr><td>6</td><td>출장/외근 승인 반영</td><td>부족구간 보완 또는 간주근무 생성</td></tr>
+        <tr><td>7</td><td>실제 휴게 우선, 자동 휴게 보조 적용</td><td>휴게시간 차감 기준 정리</td></tr>
+        <tr><td>8</td><td>판정대상시간 산출</td><td>교정실적과 보완근무를 반영한 후보 시간 계산</td></tr>
+        <tr><td>9</td><td>인정근로시간 산출</td><td>휴게·제외시간 차감 후 일별 최종 시간 계산</td></tr>
+        <tr><td>10</td><td>소정/연장/야간/휴일 분해</td><td>총시간과 가산시간 속성 분리</td></tr>
+        <tr><td>11</td><td>이상 상태 생성</td><td>누락 타각, 승인 미존재, 충돌건 분류</td></tr>
+        <tr><td>12</td><td>관리자 보정 및 확정</td><td>예외 처리, 로그 기록</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="tables">권장 결과 테이블 구조</h2>
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>일별 원천 결과</h3>
+        <ul>
+          <li><code>raw_clock_in</code>, <code>raw_clock_out</code></li>
+          <li><code>actual_break_minutes</code></li>
+          <li><code>leave_request_id</code>, <code>trip_request_id</code></li>
+          <li><code>work_pattern_id</code>, <code>calendar_type</code></li>
+        </ul>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>일별 교정·판정 결과</h3>
+        <ul>
+          <li><code>corrected_clock_in</code>, <code>corrected_clock_out</code></li>
+          <li><code>legal_work_minutes</code></li>
+          <li><code>company_approved_minutes</code></li>
+          <li><code>overtime_minutes</code>, <code>night_minutes</code>, <code>holiday_minutes</code></li>
+        </ul>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>이상·보정 결과</h3>
+        <ul>
+          <li><code>anomaly_code</code>, <code>anomaly_reason</code></li>
+          <li><code>override_flag</code>, <code>override_reason</code></li>
+          <li><code>source_doc_no</code>, <code>approved_by</code></li>
+        </ul>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>월마감 확정 결과</h3>
+        <ul>
+          <li><code>monthly_work_minutes</code></li>
+          <li><code>monthly_overtime_minutes</code></li>
+          <li><code>monthly_paid_leave_minutes</code>, <code>monthly_unpaid_leave_minutes</code></li>
+          <li><code>close_status</code>, <code>payroll_status</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="law">법령 관점 확인 포인트</h2>
+    <ul>
+      <li>휴게는 실제로 자유 이용이 가능한지, 자동 차감만으로 처리해도 되는지 구분해야 합니다.</li>
+      <li>연장 승인 여부와 실제 연장근로 발생 여부는 같은 개념이 아니므로 분리해 설명해야 합니다.</li>
+      <li>출장·외근 자동인정은 사업장 밖 간주근로와 유사한 성격을 띠므로 실제 산정 곤란 여부와 통상 필요시간 관점을 함께 봐야 합니다.</li>
+      <li>휴일근로와 야간근로는 총 인정근로시간을 다시 더하는 개념이 아니라, 이미 인정된 시간의 속성값으로 분해해야 합니다.</li>
+      <li>중소·중견기업 기준이라면 우선 <strong>상시 5인 이상 일반 사업장</strong>을 기본 전제로 보되, 선택근로·탄력근로·예외직군은 별도 체크가 필요합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="apply-docs">기존 문서에 반영할 문구 방향</h2>
+    <div class="grid-2">
+      <div class="trigger-box t-coral">
+        <h3>인정근로시간·월마감 문서에 추가할 내용</h3>
+        <p>입력원천 우선순위 뒤에 <strong>대체, 보완, 교정, 확정</strong> 구분을 붙이고, 충돌 규칙 표를 별도 섹션으로 두는 것이 좋습니다.</p>
+      </div>
+      <div class="trigger-box t-teal">
+        <h3>통합 안내 문서에 추가할 내용</h3>
+        <p>플로우맵 하단에 <strong>실적 우선 / 휴가 대체 / 출장 보완 / 정정 교체 / 관리자 확정</strong>의 5가지 처리원칙을 요약 박스로 추가하는 것이 좋습니다.</p>
+      </div>
+    </div>
+    <div class="note-box">
+      가장 중요한 변경 포인트는 기존 산식을 버리는 것이 아니라, 기존 산식 앞에 <strong>교정실적구간</strong>, <strong>상태대체구간</strong>, <strong>보완근무구간</strong>을 두는 것입니다. 이렇게 하면 현재 문서 흐름을 유지하면서도 실제 시스템 로직으로 바로 연결하기 쉬워집니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="related">함께 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간·월마감 &rarr;</a>
+      <a href="인정근로시간_통합로직.html" target="_top">인정근로시간 통합 안내 &rarr;</a>
+      <a href="근로제관리.html" target="_top">근로제 관리 &rarr;</a>
+      <a href="출장유형관리.html" target="_top">출장·외근 유형 관리 &rarr;</a>
+    </div>
+  </div>
+
+  <button class="fab-toc" id="fabToc" title="목차 열기">&#9776;</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#priority-practical">실무 판정 우선순위</a>
+    <a href="#scenarios">대표 충돌 시나리오</a>
+    <a href="#status">상태값 체계와 자동확정 기준</a>
+    <a href="#summary">문서 목적과 요약</a>
+    <a href="#good">기존 문서의 강점</a>
+    <a href="#issues">기존 문서에서 보완이 필요한 부분</a>
+    <a href="#changes">원래 문서 대비 무엇이 바뀌어야 하는가</a>
+    <a href="#model">권장 계산모델</a>
+    <a href="#priority">입력원천 우선순위</a>
+    <a href="#actions">입력원천이 갖는 역할 구분</a>
+    <a href="#conflicts">충돌 규칙 상세</a>
+    <a href="#order">권장 일별 계산 순서</a>
+    <a href="#tables">권장 결과 테이블 구조</a>
+    <a href="#law">법령 관점 확인 포인트</a>
+    <a href="#apply-docs">기존 문서에 반영할 문구 방향</a>
+    <a href="#related">함께 보면 좋은 문서</a>
+  </div>
+
+  <script>
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

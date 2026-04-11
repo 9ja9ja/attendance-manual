@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>휴가 관리 — 근태관리 통합 매뉴얼</title>
+  <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --blue: #58a6ff;
+      --blue-bg: #0d1f3c;
+      --green: #3fb950;
+      --green-bg: #0d2818;
+      --orange: #d29922;
+      --orange-bg: #2a1e00;
+      --red: #f85149;
+      --red-bg: #3b1116;
+      --purple: #bc8cff;
+      --purple-bg: #1e0e3e;
+      --teal: #39d9c1;
+      --teal-bg: #0a2e2a;
+      --pink: #f778ba;
+      --pink-bg: #3a1228;
+      --coral: #ea8a5e;
+      --coral-bg: #2c1a0e;
+      --cyan: #56d4dd;
+      --cyan-bg: #0a2a2e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Standalone navigation bar - hidden inside iframe */
+    .standalone-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .standalone-nav .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .standalone-nav .back-btn:hover { background: rgba(88,166,255,0.15); }
+    .standalone-nav .page-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .standalone-nav .page-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(63,185,80,0.12);
+      color: var(--green);
+    }
+    @media all { body.in-iframe .standalone-nav { display: none; } }
+
+    .mfg-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+    .mfg-content h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .mfg-content .subtitle {
+      color: var(--text2);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .mfg-content h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .mfg-content h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+    }
+    .mfg-content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--text2);
+    }
+    .mfg-content p {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+    .mfg-content ul {
+      margin: 0.5rem 0 1rem;
+      padding-left: 1.25rem;
+      color: var(--text);
+    }
+    .mfg-content li {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 0.4rem;
+    }
+    .section-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 3rem 0;
+    }
+
+    /* TOC */
+    .toc {
+      margin: 1.5rem 0 2.5rem;
+      padding: 1.25rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .toc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 0.75rem;
+    }
+    .toc a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.88rem;
+      display: block;
+      padding: 3px 0;
+    }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Floating TOC */
+    .fab-toc {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--blue); border: 2px solid rgba(88,166,255,0.4);
+      color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab-toc:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(88,166,255,0.4); }
+    .fab-toc.active { background: var(--bg3); border-color: var(--border); }
+    .float-toc {
+      position: fixed; bottom: 5.5rem; right: 2rem; z-index: 998;
+      width: 340px; max-height: 70vh; overflow-y: auto;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    .float-toc.show { display: block; animation: tocSlideIn 0.2s ease; }
+    @keyframes tocSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .float-toc .toc-title { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 0.6rem; }
+    .float-toc a { color: var(--blue); text-decoration: none; font-size: 0.82rem; display: block; padding: 4px 0; }
+    .float-toc a:hover { text-decoration: underline; color: #fff; }
+    body.in-iframe .fab-toc { bottom: 1.5rem; right: 1.5rem; }
+    body.in-iframe .float-toc { bottom: 4.5rem; right: 1.5rem; }
+
+    /* Tag row */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+    .tag {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      color: var(--blue);
+    }
+
+    /* Nav links */
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 1.5rem 0; }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--blue);
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { background: rgba(88,166,255,0.15); }
+
+    /* Boxes */
+    .note-box {
+      background: rgba(210,153,34,0.08);
+      border: 1px solid rgba(210,153,34,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--orange);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .important-box {
+      background: rgba(248,81,73,0.08);
+      border: 1px solid rgba(248,81,73,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--red);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .key-box {
+      background: rgba(63,185,80,0.08);
+      border: 1px solid rgba(63,185,80,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--green);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .diff-box {
+      background: rgba(188,140,255,0.08);
+      border: 1px solid rgba(188,140,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--purple);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+    .formula-box {
+      background: rgba(88,166,255,0.08);
+      border: 1px solid rgba(88,166,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--blue);
+      margin: 0.75rem 0;
+      line-height: 1.7;
+    }
+
+    /* Grid & Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1rem 0; }
+    .trigger-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .trigger-box h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    .trigger-box p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.7;
+    }
+    .trigger-box.t-green { border-left-color: var(--green); }
+    .trigger-box.t-orange { border-left-color: var(--orange); }
+    .trigger-box.t-purple { border-left-color: var(--purple); }
+    .trigger-box.t-teal { border-left-color: var(--teal); }
+    .trigger-box.t-red { border-left-color: var(--red); }
+    .trigger-box.t-pink { border-left-color: var(--pink); }
+    .trigger-box.t-coral { border-left-color: var(--coral); }
+    .trigger-box.t-cyan { border-left-color: var(--cyan); }
+
+    /* Flow steps */
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .flow-step {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flow-step strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+    .flow-step p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text3);
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    code {
+      color: var(--blue);
+      font-family: Consolas, monospace;
+    }
+
+    @media (max-width: 768px) {
+      .mfg-content { padding: 1.5rem 1rem 3rem; }
+      .mfg-content h1 { font-size: 1.4rem; }
+      .grid-2, .grid-3, .grid-4, .flow-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="standalone-nav">
+    <a class="back-btn" href="index.html" target="_top">← 인덱스</a>
+    <span class="page-title">휴가 관리</span>
+    <span class="page-badge">Leave Type Policy</span>
+  </nav>
+
+  <div class="mfg-content">
+    <h1>휴가 관리는 차감 기준, 유효기간, 유무급 속성을 결정하는 근태 계산 마스터입니다</h1>
+    <p class="subtitle"><code>휴가유형 설정</code> 화면은 단순한 휴가명 관리 페이지가 아닙니다. 휴가가 며칠 차감되는지, 시간 단위로 차감되는지, 차감 없이 상태만 기록하는지, 유효기간이 있는지, 유급인지 무급인지 같은 속성을 정의해서 직원의 휴가 신청, 잔여 휴가 차감, 월 근태 마감, 급여 반영에 동시에 영향을 주는 정책 화면입니다.</p>
+
+    <div class="tag-row">
+      <span class="tag">메뉴: 휴가유형 설정</span>
+      <span class="tag">관련 기능: 휴가유형 등록</span>
+      <span class="tag">핵심 역할: 휴가 차감 규칙, 유효기간, 사용 정책</span>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">목차</div>
+      <a href="#scope">화면이 담당하는 범위</a>
+      <a href="#basic-behavior">기본 동작</a>
+      <a href="#detail-fields">등록/수정 시 관리하는 상세 필드</a>
+      <a href="#deduction-calc">차감 방식별 계산 해석</a>
+      <a href="#expiry-policy">유효기간 정책 해석</a>
+      <a href="#operation-notes">운영 해석</a>
+      <a href="#monthly-close">월 근태 마감과의 연결</a>
+      <a href="#checklist">운영 체크리스트</a>
+      <a href="#related">같이 보면 좋은 문서</a>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="scope">화면이 담당하는 범위</h2>
+    <div class="grid-2">
+      <div class="trigger-box">
+        <h3>휴가 마스터 정의</h3>
+        <p>연차휴가, 경조휴가, 출산 및 육아휴직, 기타휴가 같은 상위 분류 아래에 실제로 직원이 신청하게 될 휴가명을 정의합니다. 이때 이름만 등록하는 것이 아니라 차감 일수, 시간, 유효기간, 유무급, 사용 여부까지 함께 확정합니다.</p>
+      </div>
+      <div class="trigger-box t-green">
+        <h3>차감 기준값</h3>
+        <p>반차, 시간차, 미차감 휴가처럼 서로 다른 차감 방식은 모두 이 화면의 설정을 기준으로 동작합니다. 따라서 월마감에서 인정근로시간을 계산할 때도 휴가유형 마스터를 읽어서 근무시간 대체와 차감량 계산을 분리해야 합니다.</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="basic-behavior">기본 동작</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>화면 내용</th>
+          <th>매뉴얼 해석</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>최초 진입</td>
+          <td>화면 상단에는 가장 먼저 선택된 휴가유형이 보이고, 상세영역에는 선택된 유형의 세부 항목이 표시됩니다.</td>
+          <td>마스터-디테일 구조이므로 사용자는 현재 어떤 휴가 정책을 편집하는지 항상 인지할 수 있어야 합니다.</td>
+        </tr>
+        <tr>
+          <td>행 선택</td>
+          <td>리스트의 특정 행을 클릭하면 상세영역이 펼쳐지며 해당 항목의 정책 속성이 표시됩니다.</td>
+          <td>조회와 수정이 분리되지 않고 연결된 구조입니다. 목록에서 항목을 고르는 순간 정책 검토가 시작됩니다.</td>
+        </tr>
+        <tr>
+          <td>등록 화면</td>
+          <td>휴가유형 등록 화면에서 새 휴가유형을 등록합니다.</td>
+          <td>새 휴가 정책은 별도 팝업에서 만들고, 저장 이후 목록과 상세가 함께 갱신되는 구조로 보는 것이 자연스럽습니다.</td>
+        </tr>
+        <tr>
+          <td>수정/삭제</td>
+          <td>기존 유형을 수정하거나 삭제할 수 있지만, 사용 이력과 사용 여부에 따라 제약이 걸립니다.</td>
+          <td>휴가 유형은 과거 신청과 차감 이력에 연결되므로 단순 삭제보다 비활성화와 이력 관리가 중요합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="detail-fields">등록/수정 시 관리하는 상세 필드</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>필드</th>
+          <th>설정 기준</th>
+          <th>업무 의미</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>휴가유형</td>
+          <td>연차휴가, 경조휴가, 출산 및 육아휴직, 기타휴가</td>
+          <td>상위 카테고리입니다. 통계와 검색, 권한, 문서 양식 분기에 함께 쓰일 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td>휴가명</td>
+          <td>최대 50자</td>
+          <td>직원이 실제 신청 화면에서 보게 되는 명칭입니다. 반차, 오후반차, 특별휴가처럼 운영 의미가 드러나야 합니다.</td>
+        </tr>
+        <tr>
+          <td>유/무급 구분</td>
+          <td>기본값: 유급</td>
+          <td>급여 계산 시 유급시간과 무급시간을 나누는 기준입니다.</td>
+        </tr>
+        <tr>
+          <td>휴가소진구분</td>
+          <td>휴가 잔액 차감 기준 선택</td>
+          <td>연차 차감인지 별도 휴가 원장 차감인지, 차감 대상이 없는 유형인지 구분하는 정책 필드입니다.</td>
+        </tr>
+        <tr>
+          <td>휴가차감일수</td>
+          <td>일수 / 시간 / 미차감</td>
+          <td>근태 계산에서 가장 중요한 필드입니다. 하루 전체 대체, 시간 단위 대체, 상태만 기록하는 경우를 구분합니다.</td>
+        </tr>
+        <tr>
+          <td>유효기간 사용여부</td>
+          <td>기본값: 사용</td>
+          <td>휴가 사용 가능 여부를 기간으로 통제할지 결정합니다.</td>
+        </tr>
+        <tr>
+          <td>유효기간 기간설정</td>
+          <td>회계연도 말까지 / 발생일로부터 / 직접설정</td>
+          <td>발생 휴가의 만료 규칙을 결정합니다.</td>
+        </tr>
+        <tr>
+          <td>소요시간</td>
+          <td>시간 단위 입력</td>
+          <td>시간차 휴가일 때 몇 시간을 인정하고 차감할지 정합니다.</td>
+        </tr>
+        <tr>
+          <td>휴가기간</td>
+          <td>기간 속성 관리</td>
+          <td>특정 기간에만 신청 가능한 휴가를 제한할 때 활용됩니다.</td>
+        </tr>
+        <tr>
+          <td>사용여부</td>
+          <td>기본값: 사용 / 미사용</td>
+          <td>신규 신청 가능 여부를 제어합니다.</td>
+        </tr>
+        <tr>
+          <td>비고</td>
+          <td>최대 100자</td>
+          <td>운영 메모와 지급 기준, 특이사항을 남기는 보조 설명 필드입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="deduction-calc">차감 방식별 계산 해석</h2>
+    <div class="note-box">계산 영향이 큰 핵심 설정</div>
+    <table>
+      <thead>
+        <tr>
+          <th>차감 방식</th>
+          <th>휴가 신청 시 의미</th>
+          <th>월마감 반영 방식</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>일수 차감</td>
+          <td>해당 일자를 통째로 휴가일로 대체합니다.</td>
+          <td>해당 일자의 소정근로시간 전체를 휴가시간으로 치환하거나, 휴일 충돌 시 정책에 따라 재판정합니다.</td>
+        </tr>
+        <tr>
+          <td>시간 차감</td>
+          <td>정해진 시간만큼 근무구간 일부를 휴가로 전환합니다.</td>
+          <td>예상 출퇴근 프레임에서 해당 시간만 비근로/휴가 구간으로 치환하고 나머지는 정상 또는 연장으로 계산합니다.</td>
+        </tr>
+        <tr>
+          <td>미차감</td>
+          <td>휴가 상태는 기록하지만 잔액은 줄지 않습니다.</td>
+          <td>차감일수에는 영향을 주지 않지만, 출근의무 대체 여부와 급여 유무는 별도 정책으로 반영해야 합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note-box">
+      <code>휴가차감일수 = 미차감</code>이 따로 존재한다는 점이 중요합니다. 월마감 설계에서도 반드시 <strong>휴가 상태</strong>와 <strong>차감 수량</strong>을 분리 저장해야 합니다.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2 id="expiry-policy">유효기간 정책 해석</h2>
+    <div class="grid-3">
+      <div class="trigger-box t-teal">
+        <h3>회계연도 말까지</h3>
+        <p>연차처럼 회계연도 기준으로 일괄 만료되는 휴가에 적합합니다. 연말 소멸 처리와 잔여 휴가 계산 로직이 함께 필요합니다.</p>
+      </div>
+      <div class="trigger-box t-purple">
+        <h3>발생일로부터</h3>
+        <p>개별 부여일을 기준으로 만료일이 계산되는 휴가에 적합합니다. 발생 건별 만료일 관리가 필요합니다.</p>
+      </div>
+      <div class="trigger-box t-orange">
+        <h3>직접설정</h3>
+        <p>행사성 휴가처럼 운영자가 직접 시작일과 종료일을 지정하는 유형에 적합합니다.</p>
+      </div>
+    </div>
+    <p>이 설정은 단순 표시용이 아니라 신청 가능 여부, 만료 경고, 잔여 휴가 집계, 월말 기준 유효 잔액 산정에 모두 사용됩니다.</p>
+
+    <hr class="section-divider">
+
+    <h2 id="operation-notes">운영 해석</h2>
+    <ul>
+      <li>휴가유형은 직원 신청, 관리자 승인, 잔여 차감, 급여 반영에 동시에 쓰이므로 삭제보다 사용여부 전환이 중요합니다.</li>
+      <li>이미 사용된 휴가유형은 과거 이력 보존이 필요하므로 이름 변경과 차감 방식 변경의 적용시점을 분리해야 합니다.</li>
+      <li>시간 차감 휴가는 직원의 예상 출퇴근 프레임과 연결해 어느 구간을 휴가로 대체할지 정해야 합니다.</li>
+      <li>유급/무급 구분은 근태와 급여를 잇는 직접적인 속성이므로 월마감 결과에도 동일하게 남아야 합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="monthly-close">월 근태 마감과의 연결</h2>
+    <div class="grid-2">
+      <div class="trigger-box t-coral">
+        <h3>일별 판정 단계</h3>
+        <p>휴가 승인 데이터가 들어오면 시스템은 해당 휴가유형 기준정보를 조회해 차감 방식, 유무급, 소요시간, 유효기간을 읽고 그날의 예상 근무 프레임에서 휴가 대체 구간을 생성합니다.</p>
+      </div>
+      <div class="trigger-box t-cyan">
+        <h3>월 집계 단계</h3>
+        <p>일수 차감, 시간 차감, 미차감, 유급, 무급이 분리되어 있어야 월별 휴가 사용량과 급여 반영 결과를 정확히 만들 수 있습니다.</p>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>마감 결과 항목</th>
+          <th>휴가유형 설정이 주는 영향</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>유급휴가시간 / 무급휴가시간</td>
+          <td>유/무급 구분에 따라 집계 분류가 달라집니다.</td>
+        </tr>
+        <tr>
+          <td>휴가 차감일수 / 차감시간</td>
+          <td>일수 차감인지 시간 차감인지에 따라 계산 저장 단위가 달라집니다.</td>
+        </tr>
+        <tr>
+          <td>미차감휴가 건수</td>
+          <td>근태 상태는 존재하지만 휴가 원장 차감에는 반영되지 않는 별도 통계가 필요합니다.</td>
+        </tr>
+        <tr>
+          <td>인정근로시간 대체 여부</td>
+          <td>휴가가 근무의무를 대체하는지 여부에 따라 해당 시간은 정상근무가 아닌 휴가시간으로 치환됩니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <h2 id="checklist">운영 체크리스트</h2>
+    <ul>
+      <li>휴가유형을 새로 만들 때는 이름보다 먼저 차감 방식, 유무급, 유효기간 정책부터 정리합니다.</li>
+      <li>시간 차감 휴가는 소요시간과 실제 적용 구간이 어떻게 연결되는지 직원 화면과 함께 검토합니다.</li>
+      <li>미차감 휴가는 잔여 차감에는 반영되지 않더라도 근태 통계와 승인 이력에는 남도록 설계합니다.</li>
+      <li>유효기간 정책을 바꾸면 과거 발생분과 신규 발생분 적용 기준을 별도로 문서화합니다.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <h2 id="related">같이 보면 좋은 문서</h2>
+    <div class="nav-links">
+      <a href="출장유형관리.html" target="_top">출장·외근 유형 관리 →</a>
+      <a href="직원근태.html" target="_top">직원 근태 →</a>
+      <a href="인정근로시간_월마감.html" target="_top">인정근로시간·월마감 →</a>
+    </div>
+  </div>
+
+  <!-- Floating TOC -->
+  <button class="fab-toc" id="fabToc" title="목차 열기">☰</button>
+  <div class="float-toc" id="floatToc">
+    <div class="toc-title">목차</div>
+    <a href="#scope">화면이 담당하는 범위</a>
+    <a href="#basic-behavior">기본 동작</a>
+    <a href="#detail-fields">상세 필드</a>
+    <a href="#deduction-calc">차감 방식별 계산 해석</a>
+    <a href="#expiry-policy">유효기간 정책 해석</a>
+    <a href="#operation-notes">운영 해석</a>
+    <a href="#monthly-close">월 근태 마감과의 연결</a>
+    <a href="#checklist">운영 체크리스트</a>
+    <a href="#related">같이 보면 좋은 문서</a>
+  </div>
+
+  <script>
+    // iframe detection
+    if (window.self !== window.top) document.body.classList.add('in-iframe');
+
+    // Floating TOC toggle
+    const fab = document.getElementById('fabToc');
+    const ftoc = document.getElementById('floatToc');
+    fab.addEventListener('click', () => {
+      const open = ftoc.classList.toggle('show');
+      fab.classList.toggle('active', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!fab.contains(e.target) && !ftoc.contains(e.target)) {
+        ftoc.classList.remove('show');
+        fab.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
