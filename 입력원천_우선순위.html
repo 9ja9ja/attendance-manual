@@ -437,6 +437,30 @@
       <span class="label">휴일인정시간</span> = 휴일 판정일의 인정근로시간 전부
     </div>
 
+    <h3>출퇴근 방식별 클램핑 산식 (실시간 등록)</h3>
+    <div class="diff-box">
+      <strong>실시간 등록에서는 조기출근·지연퇴근을 근로제 범위로 클램핑한다.</strong><br>
+      자동등록은 근로제/패턴 시간이 곧 인정시간이므로 클램핑이 불필요하다.
+    </div>
+    <div class="formula-block">
+      <span class="label">정상근로 (실시간)</span>: min(퇴근, 근로종료) − max(출근, 근로시작) − 휴게인정시간<br>
+      &nbsp;&nbsp;예) min(18:10, 18:00) − max(08:50, 09:00) − 1h = 18:00 − 09:00 − 1h = <strong>8h</strong><br><br>
+      <span class="label">연장자동 (실시간)</span>: 퇴근 − max(출근, 근로시작) − 휴게인정시간<br>
+      &nbsp;&nbsp;예) 19:00 − max(08:50, 09:00) − 1h = 19:00 − 09:00 − 1h = <strong>9h</strong> (정상 8h + 연장 1h)<br>
+      &nbsp;&nbsp;※ 퇴근 쪽은 클램핑 안 함 (초과분 = 연장), 출근 쪽만 max() 적용<br><br>
+      <span class="label">출장·외근 자동인정 미사용 (실시간)</span>: min(퇴근, 신청종료) − max(출근, 신청시작) − 휴게인정시간<br>
+      &nbsp;&nbsp;※ 타각 기록 필수. 신청 범위와 실제 타각의 교집합만 인정<br><br>
+      <span class="label">전자결재 본시간</span>: min(퇴근, 근로종료) − max(출근, 근로시작) − 휴게인정시간<br>
+      <span class="label">전자결재 연장시간</span>: 아래 4분기 중 해당 설정에 따라 산출<br>
+    </div>
+    <table>
+      <tr><th>전자결재 세부 설정</th><th>연장시간 산식</th><th>예시 (신청 18~20시)</th></tr>
+      <tr><td>최종 승인 건 근로시간 적용</td><td>승인 신청종료 − 신청시작 − 휴게</td><td>20:00 − 18:00 = <strong>2h</strong></td></tr>
+      <tr><td>실근무시간 적용 — 신청 이내</td><td>min(실퇴근 − 신청시작, 신청종료 − 신청시작)</td><td>실퇴근 19:30 → min(1:30, 2:00) = <strong>1h30m</strong></td></tr>
+      <tr><td>실근무시간 적용 — 신청 초과</td><td>신청종료 − 신청시작 (신청시간으로 상한)</td><td>실퇴근 22:00 → cap at 20:00−18:00 = <strong>2h</strong></td></tr>
+      <tr><td>전자결재 미인정</td><td>0</td><td><strong>0h</strong></td></tr>
+    </table>
+
     <h3>기준근무시간 산식</h3>
     <div class="formula-block">
       <span class="label">패턴 미사용</span>: 기준근무시간 = 근로제 소정근로시간<br>
